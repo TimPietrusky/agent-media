@@ -1,0 +1,56 @@
+{
+  "name": "@agent-media/providers",
+  "version": "0.1.0",
+  "description": "Media providers for agent-media toolkit",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com//agent-media.git",
+    "directory": "packages/providers"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./local": {
+      "types": "./dist/local/index.d.ts",
+      "import": "./dist/local/index.js"
+    },
+    "./fal": {
+      "types": "./dist/fal/index.d.ts",
+      "import": "./dist/fal/index.js"
+    },
+    "./replicate": {
+      "types": "./dist/replicate/index.d.ts",
+      "import": "./dist/replicate/index.js"
+    },
+    "./runpod": {
+      "types": "./dist/runpod/index.d.ts",
+      "import": "./dist/runpod/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@agent-media/core": "workspace:*",
+    "@ai-sdk/fal": "^2.0.6",
+    "@ai-sdk/replicate": "^2.0.6",
+    "@runpod/ai-sdk-provider": "^1.1.0",
+    "ai": "^6.0.33",
+    "sharp": "^0.33.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
