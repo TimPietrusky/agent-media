@@ -91,6 +91,48 @@ packages/
 - `HUGGINGFACE_ACCESS_TOKEN` - replicate provider (transcribe with diarization only)
 - `AGENT_MEDIA_DIR` - Custom output directory (default: `.agent-media/`)
 
+## Releasing to npm
+
+This project uses **changesets** for versioning and automated npm publishing.
+
+### How it works
+
+1. When you make changes, create a changeset:
+   ```bash
+   pnpm changeset
+   ```
+   This creates a markdown file in `.changeset/` describing the change and version bump type (patch/minor/major).
+
+2. Commit and push the changeset file along with your changes.
+
+3. The GitHub Action (`.github/workflows/release.yml`) automatically:
+   - Detects changesets on push to `main`
+   - Creates a "Version Packages" PR that bumps versions and updates CHANGELOGs
+   - When that PR is merged, publishes all updated packages to npm
+
+### Manual changeset creation
+
+For a minor release affecting multiple packages:
+```bash
+# Creates .changeset/<random-name>.md
+pnpm changeset
+# Select packages, choose bump type, write summary
+```
+
+Or create the file manually:
+```markdown
+---
+"agent-media": minor
+"@agent-media/core": minor
+---
+
+Description of changes
+```
+
+### GitHub Secrets Required
+
+- `NPM_TOKEN` - npm automation token for publishing (configured in repo settings under environment "npm")
+
 ## Design Principles
 
 - **JSON-only output**: All commands output structured JSON to stdout
