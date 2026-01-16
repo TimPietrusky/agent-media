@@ -1,15 +1,9 @@
-// Export all actions
-export { transcribe } from './actions/index.js';
-
-// Export action input types
-export type { TranscribeInput } from './actions/index.js';
+// Video package - reserved for future video-specific actions
+// Note: transcribe has moved to @agent-media/audio
 
 // Re-export core types for convenience
 export type {
   MediaResult,
-  TranscriptionSuccessResult,
-  TranscriptionData,
-  TranscriptionSegment,
 } from '@agent-media/core';
 
 export { isSuccess, isError, printResult } from '@agent-media/core';

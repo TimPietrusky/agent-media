@@ -2,8 +2,9 @@
 export type {
   MediaType,
   ImageAction,
-  VideoAction,
+  AudioAction,
   ImageFormat,
+  AudioFormat,
   MediaInput,
   ResizeOptions,
   ConvertOptions,
@@ -11,6 +12,7 @@ export type {
   GenerateOptions,
   ExtendOptions,
   EditOptions,
+  ExtractOptions,
   TranscriptionSegment,
   TranscriptionData,
   TranscribeOptions,

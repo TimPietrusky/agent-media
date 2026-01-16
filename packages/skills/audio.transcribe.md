@@ -1,20 +1,20 @@
-# Skill: Video Transcribe
+# Skill: Audio Transcribe
 
 ## Description
 
-Transcribes audio or video files to text with timestamps. Supports automatic language detection, speaker identification (diarization), and outputs structured JSON with segment-level timing.
+Transcribes audio files to text with timestamps. Supports automatic language detection, speaker identification (diarization), and outputs structured JSON with segment-level timing.
 
 ## Command
 
 ```bash
-agent-media video transcribe --in <path> [options]
+agent-media audio transcribe --in <path> [options]
 ```
 
 ## Inputs
 
 | Option | Required | Description |
 |--------|----------|-------------|
-| `--in` | Yes | Input file path or URL (supports mp3, wav, mp4, m4a, webm, ogg) |
+| `--in` | Yes | Input audio file path or URL (supports mp3, wav, m4a, ogg) |
 | `--diarize` | No | Enable speaker identification |
 | `--language` | No | Language code (auto-detected if not provided) |
 | `--speakers` | No | Number of speakers hint for diarization |
@@ -28,7 +28,7 @@ Returns a JSON object with transcription data:
 ```json
 {
   "ok": true,
-  "media_type": "video",
+  "media_type": "audio",
   "action": "transcribe",
   "provider": "fal",
   "output_path": ".agent-media/transcription_123_abc.json",
@@ -47,27 +47,39 @@ Returns a JSON object with transcription data:
 
 Basic transcription (auto-detect language):
 ```bash
-agent-media video transcribe --in interview.mp4
+agent-media audio transcribe --in interview.mp3
 ```
 
 Transcription with speaker identification:
 ```bash
-agent-media video transcribe --in meeting.mp4 --diarize
+agent-media audio transcribe --in meeting.wav --diarize
 ```
 
 Transcription with specific language and speaker count:
 ```bash
-agent-media video transcribe --in podcast.mp3 --diarize --language en --speakers 3
+agent-media audio transcribe --in podcast.mp3 --diarize --language en --speakers 3
 ```
 
 Transcribe from URL:
 ```bash
-agent-media video transcribe --in "https://example.com/video.mp4"
+agent-media audio transcribe --in "https://example.com/audio.mp3"
 ```
 
 Use specific provider:
 ```bash
-agent-media video transcribe --in audio.wav --provider replicate
+agent-media audio transcribe --in audio.wav --provider replicate
+```
+
+## Extracting Audio from Video
+
+To transcribe a video file, first extract the audio:
+
+```bash
+# Step 1: Extract audio from video
+agent-media audio extract --in video.mp4 --format mp3
+
+# Step 2: Transcribe the extracted audio
+agent-media audio transcribe --in .agent-media/extracted_xxx.mp3
 ```
 
 ## Providers

@@ -321,7 +321,7 @@ async function executeTranscribe(
   await writeFile(outputPath, JSON.stringify(transcription, null, 2));
 
   return createTranscriptionSuccess({
-    mediaType: 'video',
+    mediaType: 'audio',
     provider: 'fal',
     outputPath: outputPath,
     transcription,

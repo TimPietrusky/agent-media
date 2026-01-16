@@ -4,8 +4,8 @@ import 'dotenv/config';
 import { Command } from 'commander';
 import { registerAllProviders } from '@agent-media/providers';
 import { resize, convert, removeBackground, generate, extend, edit, printResult } from '@agent-media/image';
-import { transcribe } from '@agent-media/video';
-import type { ImageFormat } from '@agent-media/core';
+import { extract, transcribe } from '@agent-media/audio';
+import type { ImageFormat, AudioFormat } from '@agent-media/core';
 import { getConfig, mergeConfig } from '@agent-media/core';
 
 // Register all providers on startup
@@ -215,16 +215,41 @@ imageCommand
     process.exit(result.ok ? 0 : 1);
   });
 
-// Video command group
-const videoCommand = program
-  .command('video')
-  .description('Video processing commands');
+// Audio command group
+const audioCommand = program
+  .command('audio')
+  .description('Audio processing commands');
 
-// Video transcribe command
-videoCommand
+// Audio extract command
+audioCommand
+  .command('extract')
+  .description('Extract audio track from a video file (local processing, no API needed)')
+  .requiredOption('--in <path>', 'Input video file path or URL')
+  .option('--format <format>', 'Output audio format (mp3, wav)', 'mp3')
+  .option('--out <path>', 'Output directory')
+  .action(async (options: {
+    in: string;
+    format?: string;
+    out?: string;
+  }) => {
+    const config = getConfig();
+    const merged = mergeConfig(config, { out: options.out });
+
+    const result = await extract({
+      input: options.in,
+      format: (options.format as AudioFormat) || 'mp3',
+      out: merged.outputDir,
+    });
+
+    printResult(result);
+    process.exit(result.ok ? 0 : 1);
+  });
+
+// Audio transcribe command
+audioCommand
   .command('transcribe')
-  .description('Transcribe audio/video to text with timestamps')
-  .requiredOption('--in <path>', 'Input file path or URL')
+  .description('Transcribe audio to text with timestamps')
+  .requiredOption('--in <path>', 'Input audio file path or URL')
   .option('--diarize', 'Enable speaker identification')
   .option('--language <code>', 'Language code (auto-detected if not provided)')
   .option('--speakers <number>', 'Number of speakers hint', parseInt)

@@ -9,9 +9,23 @@ export type MediaType = 'image' | 'video' | 'audio';
 export type ImageAction = 'resize' | 'convert' | 'remove-background' | 'generate' | 'extend' | 'edit';
 
 /**
- * Supported video actions
+ * Supported audio actions
  */
-export type VideoAction = 'transcribe';
+export type AudioAction = 'extract' | 'transcribe';
+
+/**
+ * Supported audio output formats for extraction
+ */
+export type AudioFormat = 'mp3' | 'wav';
+
+/**
+ * Options for extract action (extract audio from video)
+ */
+export interface ExtractOptions {
+  input: MediaInput;
+  /** Output audio format */
+  format?: AudioFormat;
+}
 
 /**
  * Supported image formats
@@ -146,6 +160,7 @@ export type ActionOptions =
   | { action: 'generate'; options: GenerateOptions }
   | { action: 'extend'; options: ExtendOptions }
   | { action: 'edit'; options: EditOptions }
+  | { action: 'extract'; options: ExtractOptions }
   | { action: 'transcribe'; options: TranscribeOptions };
 
 /**

@@ -24,12 +24,14 @@ node packages/cli/dist/index.js image <action> [options]
 
 ## Architecture
 
-This is a **pnpm monorepo** with five packages:
+This is a **pnpm monorepo** with six packages:
 
 ```
 packages/
 ├── core/       # Shared types, provider registry, result builders, config
 ├── image/      # Image action implementations (resize, convert, generate, remove-background, extend, edit)
+├── audio/      # Audio action implementations (extract, transcribe)
+├── video/      # Reserved for future video-specific actions
 ├── providers/  # Provider implementations (local/Sharp, fal.ai, replicate, runpod)
 ├── cli/        # Commander.js entry point (bin: agent-media)
 └── skills/     # Markdown skill definitions for agent discovery
@@ -41,7 +43,11 @@ packages/
 - `packages/core/src/provider/index.ts` - Registry and resolution logic
 - Provider resolution priority: CLI flag → env vars → local → any supporting provider
 
-**Action Layer**: Each action in `packages/image/src/actions/` validates input and delegates to providers via `executeAction()`.
+**Action Layer**: Each action in `packages/image/src/actions/` or `packages/audio/src/actions/` validates input and delegates to providers via `executeAction()`.
+
+**Audio Package**: The `packages/audio/` package handles audio operations:
+- `extract` - Extracts audio from video files using bundled ffmpeg (via `ffmpeg-static`). No API keys needed.
+- `transcribe` - Transcribes audio to text using cloud providers (fal, replicate).
 
 **Result Contract**: All output is JSON via `MediaResult` (success or error):
 - `packages/core/src/result/index.ts` - `createSuccess()`, `createError()`, `printResult()`
@@ -69,11 +75,20 @@ packages/
 4. Add CLI command in `packages/cli/src/index.ts`
 5. Create skill definition in `packages/skills/`
 
+### Adding a New Audio Action
+
+1. Add action type to `AudioAction` in `packages/core/src/types/index.ts`
+2. Create action function in `packages/audio/src/actions/<action>.ts`
+3. Export from `packages/audio/src/actions/index.ts`
+4. Add CLI command in `packages/cli/src/index.ts`
+5. Create skill definition in `packages/skills/`
+
 ## Environment Variables
 
-- `FAL_API_KEY` - fal provider (generate, remove-background)
-- `REPLICATE_API_TOKEN` - replicate provider (generate, remove-background)
+- `FAL_API_KEY` - fal provider (generate, remove-background, transcribe)
+- `REPLICATE_API_TOKEN` - replicate provider (generate, remove-background, transcribe)
 - `RUNPOD_API_KEY` - runpod provider (generate, edit)
+- `HUGGINGFACE_ACCESS_TOKEN` - replicate provider (transcribe with diarization only)
 - `AGENT_MEDIA_DIR` - Custom output directory (default: `.agent-media/`)
 
 ## Design Principles
