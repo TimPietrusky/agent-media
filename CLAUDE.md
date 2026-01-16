@@ -93,45 +93,33 @@ packages/
 
 ## Releasing to npm
 
-This project uses **changesets** for versioning and automated npm publishing.
+This project uses **changesets** for versioning and automated npm publishing via GitHub Actions with OIDC authentication (no npm token needed).
 
 ### How it works
 
-1. When you make changes, create a changeset:
-   ```bash
-   pnpm changeset
-   ```
-   This creates a markdown file in `.changeset/` describing the change and version bump type (patch/minor/major).
+1. Create a changeset file (manually or via `pnpm changeset`):
+   ```markdown
+   <!-- .changeset/my-change.md -->
+   ---
+   "agent-media": minor
+   "@agent-media/core": minor
+   ---
 
-2. Commit and push the changeset file along with your changes.
+   Description of changes
+   ```
+
+2. Commit and push the changeset file along with your code changes to `main`.
 
 3. The GitHub Action (`.github/workflows/release.yml`) automatically:
-   - Detects changesets on push to `main`
+   - Detects the changeset on push to `main`
    - Creates a "Version Packages" PR that bumps versions and updates CHANGELOGs
    - When that PR is merged, publishes all updated packages to npm
 
-### Manual changeset creation
+### Important
 
-For a minor release affecting multiple packages:
-```bash
-# Creates .changeset/<random-name>.md
-pnpm changeset
-# Select packages, choose bump type, write summary
-```
-
-Or create the file manually:
-```markdown
----
-"agent-media": minor
-"@agent-media/core": minor
----
-
-Description of changes
-```
-
-### GitHub Secrets Required
-
-- `NPM_TOKEN` - npm automation token for publishing (configured in repo settings under environment "npm")
+- **Do NOT run `pnpm changeset version` locally** - let the GitHub Action handle it
+- The repo uses OIDC authentication with npm (via `id-token: write` permission) - no npm token secrets needed
+- Just create the changeset file, commit, push, and let automation handle the rest
 
 ## Design Principles
 
