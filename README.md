@@ -4,7 +4,13 @@ Media processing CLI for AI agents. Resize, convert, generate, and remove backgr
 
 ## Installation
 
-### npm (recommended)
+### npx (no install)
+
+```bash
+npx agent-media image resize --in photo.jpg --width 800
+```
+
+### npm (global install)
 
 ```bash
 npm install -g agent-media
@@ -13,7 +19,7 @@ npm install -g agent-media
 ### From Source
 
 ```bash
-git clone https://github.com/anthropics/agent-media
+git clone https://github.com/TimPietrusky/agent-media
 cd agent-media
 pnpm install
 pnpm build
