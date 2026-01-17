@@ -1,5 +1,12 @@
 # agent-media
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [ac65ff4]
+  - @agent-media/audio@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
