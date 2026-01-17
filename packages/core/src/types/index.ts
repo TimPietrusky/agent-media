@@ -74,6 +74,8 @@ export interface ConvertOptions {
  */
 export interface RemoveBackgroundOptions {
   input: MediaInput;
+  /** Override default model (e.g., "fal-ai/birefnet/v2") */
+  model?: string;
 }
 
 /**
@@ -85,6 +87,8 @@ export interface GenerateOptions {
   height?: number;
   /** Number of images to generate (default: 1) */
   count?: number;
+  /** Override default model (e.g., "fal-ai/flux-2", "black-forest-labs/flux-2-dev") */
+  model?: string;
 }
 
 /**
@@ -107,6 +111,8 @@ export interface EditOptions {
   input: MediaInput;
   /** Text prompt describing the desired edit */
   prompt: string;
+  /** Override default model (e.g., "fal-ai/flux-2/edit") */
+  model?: string;
 }
 
 /**
@@ -136,6 +142,8 @@ export interface TranscribeOptions {
   diarize?: boolean;
   language?: string;
   numSpeakers?: number;
+  /** Override default model (e.g., "fal-ai/whisper") */
+  model?: string;
 }
 
 /**

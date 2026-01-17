@@ -20,6 +20,11 @@ pnpm build
 pnpm link --global
 ```
 
+## Requirements
+
+- Node.js >= 18.0.0
+- pnpm (for development from source)
+
 ## Quick Start
 
 ```bash
@@ -38,7 +43,18 @@ agent-media image resize --in <path> [options]      # Resize image
 agent-media image convert --in <path> --format <f>  # Convert format
 agent-media image remove-background --in <path>     # Remove background
 agent-media image generate --prompt <text>          # Generate from prompt
+agent-media image extend --in <path> --padding <px> --color <hex>  # Extend canvas
+agent-media image edit --in <path> --prompt <text>  # Edit with prompt
 ```
+
+### Audio Commands
+
+```bash
+agent-media audio extract --in <video>              # Extract audio from video
+agent-media audio transcribe --in <audio>           # Transcribe audio to text
+```
+
+---
 
 ### Resize
 
@@ -99,6 +115,76 @@ agent-media image generate --prompt "sunset over mountains" --width 1024 --heigh
 | `--height <px>` | Height (default: 1024) |
 | `--out <dir>` | Output directory |
 | `--provider <name>` | Provider (fal, replicate, runpod) |
+| `--model <name>` | Model override (e.g., `fal-ai/flux-2`, `black-forest-labs/flux-2-dev`) |
+
+### Extend
+
+Extend image canvas by adding padding on all sides with a solid background color.
+
+```bash
+agent-media image extend --in photo.jpg --padding 50 --color "#E4ECF8"
+agent-media image extend --in photo.png --padding 100 --color "#FFFFFF" --dpi 300
+```
+
+| Option | Description |
+|--------|-------------|
+| `--in <path>` | Input file path or URL (required) |
+| `--padding <px>` | Padding size in pixels to add on all sides (required) |
+| `--color <hex>` | Background color for extended area (required). Also flattens transparency. |
+| `--dpi <n>` | DPI/density for output image (default: 300) |
+| `--out <dir>` | Output directory |
+| `--provider <name>` | Provider (local) |
+
+### Edit
+
+Edit an image using a text prompt (image-to-image).
+
+```bash
+agent-media image edit --in photo.jpg --prompt "make the sky more vibrant"
+agent-media image edit --in portrait.jpg --prompt "add sunglasses"
+```
+
+| Option | Description |
+|--------|-------------|
+| `--in <path>` | Input file path or URL (required) |
+| `--prompt <text>` | Text description of the desired edit (required) |
+| `--out <dir>` | Output directory |
+| `--provider <name>` | Provider (fal, replicate, runpod) |
+| `--model <name>` | Model override (e.g., `fal-ai/flux-2/edit`) |
+
+### Audio Extract
+
+Extract audio track from a video file. Uses local ffmpeg, no API key needed.
+
+```bash
+agent-media audio extract --in video.mp4
+agent-media audio extract --in video.mp4 --format wav
+```
+
+| Option | Description |
+|--------|-------------|
+| `--in <path>` | Input video file path or URL (required) |
+| `--format <f>` | Output format: mp3, wav (default: mp3) |
+| `--out <dir>` | Output directory |
+
+### Audio Transcribe
+
+Transcribe audio to text with timestamps. Supports speaker identification.
+
+```bash
+agent-media audio transcribe --in audio.mp3
+agent-media audio transcribe --in audio.mp3 --diarize --speakers 2
+```
+
+| Option | Description |
+|--------|-------------|
+| `--in <path>` | Input audio file path or URL (required) |
+| `--diarize` | Enable speaker identification |
+| `--language <code>` | Language code (auto-detected if not provided) |
+| `--speakers <n>` | Number of speakers hint |
+| `--out <dir>` | Output directory |
+| `--provider <name>` | Provider (fal, replicate) |
+| `--model <name>` | Model override |
 
 ## Output Format
 
@@ -132,11 +218,22 @@ Exit code is `0` on success, `1` on error.
 
 ## Providers
 
+### Default Models
+
+| Provider | generate | edit | remove-background | transcribe |
+|----------|----------|------|-------------------|------------|
+| **fal** | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/wizper` |
+| **replicate** | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | WhisperX |
+| **runpod** | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - |
+| **local** | - | - | - | - |
+
+Use `--model <name>` to override the default model for any command.
+
 ### Local (default)
 
 Uses Sharp for image processing. No API key required.
 
-**Supports:** resize, convert
+**Supports:** resize, convert, extend
 
 ```bash
 agent-media image resize --in photo.jpg --width 800  # Uses local automatically
@@ -144,37 +241,47 @@ agent-media image resize --in photo.jpg --width 800  # Uses local automatically
 
 ### Fal
 
-Uses fal.ai for AI-powered image operations.
+Uses fal.ai for AI-powered image and audio operations.
 
-**Supports:** generate, remove-background
+**Supports:** generate, edit, remove-background, transcribe
 
 ```bash
 export FAL_API_KEY=your-key
 agent-media image generate --prompt "a red robot"
+agent-media image edit --in photo.jpg --prompt "add a hat"
 agent-media image remove-background --in photo.jpg
+agent-media audio transcribe --in audio.mp3
 ```
+
+[Get your FAL API key](https://fal.ai/dashboard/keys)
 
 ### Replicate
 
-Uses Replicate for AI-powered image operations.
+Uses Replicate for AI-powered image and audio operations.
 
-**Supports:** generate, remove-background
+**Supports:** generate, edit, remove-background, transcribe
 
 ```bash
 export REPLICATE_API_TOKEN=your-token
 agent-media image generate --prompt "a red robot" --provider replicate
+agent-media image edit --in photo.jpg --prompt "add a hat" --provider replicate
 ```
+
+[Get your Replicate API token](https://replicate.com/account/api-tokens)
 
 ### Runpod
 
-Uses Runpod for AI-powered image generation.
+Uses Runpod for AI-powered image generation and editing.
 
-**Supports:** generate
+**Supports:** generate, edit
 
 ```bash
 export RUNPOD_API_KEY=your-key
 agent-media image generate --prompt "a red robot" --provider runpod
+agent-media image edit --in photo.jpg --prompt "add sunglasses" --provider runpod
 ```
+
+[Get your Runpod API key](https://www.runpod.io/console/user/settings)
 
 ### Provider Selection
 
@@ -185,12 +292,13 @@ agent-media image generate --prompt "a red robot" --provider runpod
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `FAL_API_KEY` | fal.ai API key |
-| `REPLICATE_API_TOKEN` | Replicate API key |
-| `RUNPOD_API_KEY` | Runpod API key |
-| `AGENT_MEDIA_DIR` | Output directory (default: `.agent-media/`) |
+| Variable | Description | Get Key |
+|----------|-------------|---------|
+| `FAL_API_KEY` | fal.ai API key | [fal.ai](https://fal.ai/dashboard/keys) |
+| `REPLICATE_API_TOKEN` | Replicate API token | [replicate.com](https://replicate.com/account/api-tokens) |
+| `RUNPOD_API_KEY` | Runpod API key | [runpod.io](https://www.runpod.io/console/user/settings) |
+| `HUGGINGFACE_ACCESS_TOKEN` | For transcription with speaker ID (replicate only) | [huggingface.co](https://huggingface.co/settings/tokens) |
+| `AGENT_MEDIA_DIR` | Output directory (default: `.agent-media/`) | - |
 
 ## Usage with AI Agents
 
@@ -208,13 +316,21 @@ Add to your project instructions:
 ```markdown
 ## Media Processing
 
-Use `agent-media` for image operations. Run `agent-media --help` for commands.
+Use `agent-media` for image and audio operations. Run `agent-media --help` for commands.
 
 - `agent-media image resize --in <path> --width <px>` - Resize image
 - `agent-media image convert --in <path> --format <f>` - Convert format
 - `agent-media image generate --prompt <text>` - Generate image
+- `agent-media image edit --in <path> --prompt <text>` - Edit image
 - `agent-media image remove-background --in <path>` - Remove background
+- `agent-media audio extract --in <video>` - Extract audio from video
+- `agent-media audio transcribe --in <audio>` - Transcribe audio
 
 All commands output JSON with `ok: true/false` and exit 0/1.
 ```
 
+## Roadmap
+
+- [ ] Local CPU background removal via transformers.js/ONNX (zero API keys)
+- [ ] Video processing actions
+- [ ] Batch processing support

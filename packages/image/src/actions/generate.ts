@@ -14,6 +14,8 @@ export interface GenerateInput {
   out?: string;
   /** Provider to use (overrides auto-detection) */
   provider?: string;
+  /** Model to use (overrides provider default) */
+  model?: string;
 }
 
 /**
@@ -35,6 +37,7 @@ export async function generate(options: GenerateInput): Promise<MediaResult> {
         width: options.width,
         height: options.height,
         count: options.count,
+        model: options.model,
       },
     },
     context

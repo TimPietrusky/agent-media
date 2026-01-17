@@ -11,6 +11,7 @@ import type {
   RemoveBackgroundOptions,
   TranscribeOptions,
   TranscriptionData,
+  EditOptions,
 } from '@agent-media/core';
 import {
   createSuccess,
@@ -25,7 +26,7 @@ import {
 /**
  * Actions supported by the fal provider
  */
-const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe'];
+const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe', 'edit'];
 
 /**
  * Fal.ai provider for image generation and processing
@@ -61,6 +62,8 @@ export const falProvider: MediaProvider = {
           return await executeRemoveBackground(actionConfig.options, context, apiKey);
         case 'transcribe':
           return await executeTranscribe(actionConfig.options, context, apiKey);
+        case 'edit':
+          return await executeEdit(actionConfig.options, context, apiKey);
         default:
           return createError(
             ErrorCodes.INVALID_INPUT,
@@ -76,22 +79,24 @@ export const falProvider: MediaProvider = {
 
 /**
  * Execute generate action using fal.ai flux model via AI SDK
+ * Default model: fal-ai/flux-2 (FLUX.2 Dev)
  */
 async function executeGenerate(
   options: GenerateOptions,
   context: ActionContext,
   apiKey: string
 ): Promise<MediaResult> {
-  const { prompt, width = 1024, height = 1024 } = options;
+  const { prompt, width = 1024, height = 1024, model } = options;
 
   if (!prompt) {
     return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image generation');
   }
 
-  const fal = createFal({ apiKey });
+  const falClient = createFal({ apiKey });
+  const modelId = model || 'fal-ai/flux-2';
 
   const { image } = await generateImage({
-    model: fal.image('fal-ai/flux/schnell'),
+    model: falClient.image(modelId),
     prompt,
     size: `${width}x${height}`,
   });
@@ -106,6 +111,96 @@ async function executeGenerate(
   return createSuccess({
     mediaType: 'image',
     action: 'generate',
+    provider: 'fal',
+    outputPath: outputPath,
+    mime: 'image/png',
+    bytes: stats.size,
+  });
+}
+
+/**
+ * Execute edit action using fal.ai flux-2 edit model
+ * Default model: fal-ai/flux-2/edit
+ */
+async function executeEdit(
+  options: EditOptions,
+  context: ActionContext,
+  apiKey: string
+): Promise<MediaResult> {
+  const { input, prompt, model } = options;
+
+  if (!input?.source) {
+    return createError(ErrorCodes.INVALID_INPUT, 'Input source is required for image editing');
+  }
+
+  if (!prompt) {
+    return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image editing');
+  }
+
+  // Prepare the image URL - edit model requires a URL
+  let imageUrl: string;
+  if (input.isUrl) {
+    imageUrl = input.source;
+  } else {
+    // Convert local file to data URI
+    const buffer = await readFile(input.source);
+    const base64 = buffer.toString('base64');
+    const ext = input.source.toLowerCase().split('.').pop();
+    const mimeType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+    imageUrl = `data:${mimeType};base64,${base64}`;
+  }
+
+  const modelId = model || 'fal-ai/flux-2/edit';
+
+  // Call the edit model via fal.run API
+  const response = await fetch(`https://fal.run/${modelId}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Key ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      image_url: imageUrl,
+      prompt,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return createError(ErrorCodes.API_ERROR, `Fal API error: ${response.status} - ${errorText}`);
+  }
+
+  const result = await response.json() as {
+    images?: Array<{ url: string; content_type?: string }>;
+    image?: { url: string; content_type?: string };
+  };
+
+  // Handle both single image and array responses
+  const outputImageUrl = result.images?.[0]?.url || result.image?.url;
+
+  if (!outputImageUrl) {
+    return createError(ErrorCodes.PROVIDER_ERROR, 'No image returned from edit operation');
+  }
+
+  // Download the edited image
+  const imageResponse = await fetch(outputImageUrl);
+  if (!imageResponse.ok) {
+    return createError(ErrorCodes.NETWORK_ERROR, `Failed to download edited image: ${imageResponse.statusText}`);
+  }
+
+  const arrayBuffer = await imageResponse.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  const outputFilename = generateOutputFilename('png', 'edited');
+  const outputPath = getOutputPath(context.outputDir, outputFilename);
+
+  await writeFile(outputPath, buffer);
+
+  const stats = await stat(outputPath);
+
+  return createSuccess({
+    mediaType: 'image',
+    action: 'edit',
     provider: 'fal',
     outputPath: outputPath,
     mime: 'image/png',
