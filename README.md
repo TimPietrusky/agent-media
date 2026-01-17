@@ -1,6 +1,10 @@
 # agent-media
 
-Media processing CLI for AI agents. Generate, edit, resize images. Extract and transcribe audio from video.
+Media processing CLI for AI agents.
+
+- **Image**: generate, edit, remove-background, resize, convert, extend
+- **Video**: extract audio
+- **Audio**: transcribe (with speaker identification)
 
 ## Quick Start
 
