@@ -100,11 +100,13 @@ imageCommand
   .description('Remove the background from an image')
   .requiredOption('--in <path>', 'Input file path or URL')
   .option('--out <path>', 'Output directory')
-  .option('--provider <name>', 'Provider to use (fal, replicate, runpod)')
+  .option('--provider <name>', 'Provider to use (fal, replicate)')
+  .option('--model <name>', 'Model to use (overrides provider default)')
   .action(async (options: {
     in: string;
     out?: string;
     provider?: string;
+    model?: string;
   }) => {
     const config = getConfig();
     const merged = mergeConfig(config, { out: options.out, provider: options.provider });
@@ -113,6 +115,7 @@ imageCommand
       input: options.in,
       out: merged.outputDir,
       provider: merged.provider,
+      model: options.model,
     });
 
     printResult(result);
@@ -129,6 +132,7 @@ imageCommand
   .option('--count <number>', 'Number of images to generate', parseInt)
   .option('--out <path>', 'Output directory')
   .option('--provider <name>', 'Provider to use (fal, replicate, runpod)')
+  .option('--model <name>', 'Model to use (overrides provider default, e.g., fal-ai/flux-2)')
   .action(async (options: {
     prompt: string;
     width?: number;
@@ -136,6 +140,7 @@ imageCommand
     count?: number;
     out?: string;
     provider?: string;
+    model?: string;
   }) => {
     const config = getConfig();
     const merged = mergeConfig(config, { out: options.out, provider: options.provider });
@@ -147,6 +152,7 @@ imageCommand
       count: options.count,
       out: merged.outputDir,
       provider: merged.provider,
+      model: options.model,
     });
 
     printResult(result);
@@ -194,12 +200,14 @@ imageCommand
   .requiredOption('--in <path>', 'Input file path or URL')
   .requiredOption('--prompt <text>', 'Text description of the desired edit')
   .option('--out <path>', 'Output directory')
-  .option('--provider <name>', 'Provider to use (runpod)')
+  .option('--provider <name>', 'Provider to use (fal, replicate, runpod)')
+  .option('--model <name>', 'Model to use (overrides provider default, e.g., fal-ai/flux-2/edit)')
   .action(async (options: {
     in: string;
     prompt: string;
     out?: string;
     provider?: string;
+    model?: string;
   }) => {
     const config = getConfig();
     const merged = mergeConfig(config, { out: options.out, provider: options.provider });
@@ -209,6 +217,7 @@ imageCommand
       prompt: options.prompt,
       out: merged.outputDir,
       provider: merged.provider,
+      model: options.model,
     });
 
     printResult(result);
@@ -255,6 +264,7 @@ audioCommand
   .option('--speakers <number>', 'Number of speakers hint', parseInt)
   .option('--out <path>', 'Output directory')
   .option('--provider <name>', 'Provider to use (fal, replicate)')
+  .option('--model <name>', 'Model to use (overrides provider default)')
   .action(async (options: {
     in: string;
     diarize?: boolean;
@@ -262,6 +272,7 @@ audioCommand
     speakers?: number;
     out?: string;
     provider?: string;
+    model?: string;
   }) => {
     const config = getConfig();
     const merged = mergeConfig(config, { out: options.out, provider: options.provider });
@@ -273,6 +284,7 @@ audioCommand
       numSpeakers: options.speakers,
       out: merged.outputDir,
       provider: merged.provider,
+      model: options.model,
     });
 
     printResult(result);

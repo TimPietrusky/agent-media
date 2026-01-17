@@ -10,6 +10,8 @@ export interface EditInput {
   out?: string;
   /** Provider to use (overrides auto-detection) */
   provider?: string;
+  /** Model to use (overrides provider default) */
+  model?: string;
 }
 
 /**
@@ -36,6 +38,7 @@ export async function edit(options: EditInput): Promise<MediaResult> {
       options: {
         input: mediaInput,
         prompt: options.prompt,
+        model: options.model,
       },
     },
     context

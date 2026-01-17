@@ -8,6 +8,8 @@ export interface RemoveBackgroundInput {
   out?: string;
   /** Provider to use (overrides auto-detection) */
   provider?: string;
+  /** Model to use (overrides provider default) */
+  model?: string;
 }
 
 /**
@@ -33,6 +35,7 @@ export async function removeBackground(options: RemoveBackgroundInput): Promise<
       action: 'remove-background',
       options: {
         input,
+        model: options.model,
       },
     },
     context

@@ -10,6 +10,7 @@ import type {
   RemoveBackgroundOptions,
   TranscribeOptions,
   TranscriptionData,
+  EditOptions,
 } from '@agent-media/core';
 import {
   createSuccess,
@@ -24,7 +25,7 @@ import {
 /**
  * Actions supported by the replicate provider
  */
-const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe'];
+const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe', 'edit'];
 
 /**
  * Replicate provider for image generation and processing
@@ -60,6 +61,8 @@ export const replicateProvider: MediaProvider = {
           return await executeRemoveBackground(actionConfig.options, context, apiToken);
         case 'transcribe':
           return await executeTranscribe(actionConfig.options, context, apiToken);
+        case 'edit':
+          return await executeEdit(actionConfig.options, context, apiToken);
         default:
           return createError(
             ErrorCodes.INVALID_INPUT,
@@ -74,23 +77,25 @@ export const replicateProvider: MediaProvider = {
 };
 
 /**
- * Execute generate action using Replicate flux-schnell model via AI SDK
+ * Execute generate action using Replicate flux model via AI SDK
+ * Default model: black-forest-labs/flux-2-dev (FLUX.2 Dev)
  */
 async function executeGenerate(
   options: GenerateOptions,
   context: ActionContext,
   apiToken: string
 ): Promise<MediaResult> {
-  const { prompt, width = 1024, height = 1024 } = options;
+  const { prompt, width = 1024, height = 1024, model } = options;
 
   if (!prompt) {
     return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image generation');
   }
 
-  const replicate = createReplicate({ apiToken });
+  const replicateClient = createReplicate({ apiToken });
+  const modelId = model || 'black-forest-labs/flux-2-dev';
 
   const { image } = await generateImage({
-    model: replicate.image('black-forest-labs/flux-schnell'),
+    model: replicateClient.image(modelId),
     prompt,
     size: `${width}x${height}`,
   });
@@ -105,6 +110,130 @@ async function executeGenerate(
   return createSuccess({
     mediaType: 'image',
     action: 'generate',
+    provider: 'replicate',
+    outputPath: outputPath,
+    mime: 'image/webp',
+    bytes: stats.size,
+  });
+}
+
+/**
+ * Execute edit action using Replicate flux-kontext model
+ * Default model: black-forest-labs/flux-kontext-dev
+ */
+async function executeEdit(
+  options: EditOptions,
+  context: ActionContext,
+  apiToken: string
+): Promise<MediaResult> {
+  const { input, prompt, model } = options;
+
+  if (!input?.source) {
+    return createError(ErrorCodes.INVALID_INPUT, 'Input source is required for image editing');
+  }
+
+  if (!prompt) {
+    return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image editing');
+  }
+
+  // Prepare the image input
+  let imageUrl: string;
+  if (input.isUrl) {
+    imageUrl = input.source;
+  } else {
+    // Convert local file to data URI
+    const buffer = await readFile(input.source);
+    const base64 = buffer.toString('base64');
+    const ext = input.source.toLowerCase().split('.').pop();
+    const mimeType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+    imageUrl = `data:${mimeType};base64,${base64}`;
+  }
+
+  const modelId = model || 'black-forest-labs/flux-kontext-dev';
+
+  // Call the edit model via Replicate API
+  const response = await fetch('https://api.replicate.com/v1/predictions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiToken}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'wait',
+    },
+    body: JSON.stringify({
+      model: modelId,
+      input: {
+        image: imageUrl,
+        prompt,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return createError(ErrorCodes.API_ERROR, `Replicate API error: ${response.status} - ${errorText}`);
+  }
+
+  const result = await response.json() as {
+    output?: string | string[];
+    status?: string;
+    error?: string;
+    urls?: { get: string };
+  };
+
+  // Handle async predictions (poll if needed)
+  let outputUrl: string | undefined;
+  if (result.status === 'succeeded' && result.output) {
+    outputUrl = Array.isArray(result.output) ? result.output[0] : result.output;
+  } else if (result.status === 'processing' && result.urls?.get) {
+    // Poll for completion
+    const maxAttempts = 60;
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+      const pollResponse = await fetch(result.urls.get, {
+        headers: { 'Authorization': `Bearer ${apiToken}` },
+      });
+      const pollResult = await pollResponse.json() as typeof result;
+
+      if (pollResult.status === 'succeeded' && pollResult.output) {
+        outputUrl = Array.isArray(pollResult.output) ? pollResult.output[0] : pollResult.output;
+        break;
+      } else if (pollResult.status === 'failed') {
+        return createError(ErrorCodes.PROVIDER_ERROR, pollResult.error || 'Edit failed');
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      attempts++;
+    }
+    if (!outputUrl) {
+      return createError(ErrorCodes.PROVIDER_ERROR, 'Edit timed out');
+    }
+  } else if (result.output) {
+    outputUrl = Array.isArray(result.output) ? result.output[0] : result.output;
+  }
+
+  if (!outputUrl) {
+    return createError(ErrorCodes.PROVIDER_ERROR, 'No image returned from edit operation');
+  }
+
+  // Download the edited image
+  const imageResponse = await fetch(outputUrl);
+  if (!imageResponse.ok) {
+    return createError(ErrorCodes.NETWORK_ERROR, `Failed to download edited image: ${imageResponse.statusText}`);
+  }
+
+  const arrayBuffer = await imageResponse.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  const outputFilename = generateOutputFilename('webp', 'edited');
+  const outputPath = getOutputPath(context.outputDir, outputFilename);
+
+  await writeFile(outputPath, buffer);
+
+  const stats = await stat(outputPath);
+
+  return createSuccess({
+    mediaType: 'image',
+    action: 'edit',
     provider: 'replicate',
     outputPath: outputPath,
     mime: 'image/webp',

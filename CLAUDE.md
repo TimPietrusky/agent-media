@@ -97,33 +97,93 @@ packages/
 - `HUGGINGFACE_ACCESS_TOKEN` - replicate provider (transcribe with diarization only)
 - `AGENT_MEDIA_DIR` - Custom output directory (default: `.agent-media/`)
 
+## Commit Workflow
+
+When the user asks to "commit" or you need to commit changes, follow this workflow:
+
+### 1. Build and verify
+```bash
+pnpm build
+```
+
+### 2. Check what changed
+```bash
+git status
+git diff --stat
+```
+
+### 3. Create a changeset file
+Create `.changeset/<descriptive-name>.md`:
+```markdown
+---
+"agent-media": patch|minor|major
+"@agent-media/core": patch|minor|major
+"@agent-media/providers": patch|minor|major
+"@agent-media/image": patch|minor|major
+"@agent-media/audio": patch|minor|major
+"@agent-media/cli": patch|minor|major
+---
+
+Brief description of changes
+```
+
+Only include packages that were actually modified. Use:
+- `patch` for bug fixes
+- `minor` for new features (backward compatible)
+- `major` for breaking changes
+
+### 4. Create feature branch
+```bash
+git checkout -b feat/<descriptive-name>
+# or fix/<descriptive-name> for bug fixes
+```
+
+### 5. Stage and commit
+```bash
+git add <files> .changeset/<name>.md
+git commit -m "feat|fix: descriptive message"
+```
+
+### 6. Push and create PR
+```bash
+git push -u origin <branch-name>
+
+# Switch to YOUR_PRIMARY_ACCOUNT account for this repo (remote is github.com)
+gh auth switch --user YOUR_PRIMARY_ACCOUNT
+
+gh pr create --title "..." --body "..."
+
+# ALWAYS switch back to RunPod account when done
+gh auth switch --user YOUR_SECONDARY_ACCOUNT
+```
+
+### Important
+- **NEVER** manually edit CHANGELOG.md - changesets auto-generates it
+- **NEVER** run `pnpm changeset version` locally
+- Always include the changeset file with your commit
+- The GitHub Action handles version bumps and npm publishing
+
 ## Releasing to npm
 
 This project uses **changesets** for versioning and automated npm publishing via GitHub Actions with OIDC authentication (no npm token needed).
 
 ### How it works
 
-1. Create a changeset file (manually or via `pnpm changeset`):
-   ```markdown
-   <!-- .changeset/my-change.md -->
-   ---
-   "agent-media": minor
-   "@agent-media/core": minor
-   ---
+1. Create a changeset file (see Commit Workflow above)
 
-   Description of changes
-   ```
+2. Commit and push the changeset file along with your code changes
 
-2. Commit and push the changeset file along with your code changes to `main`.
+3. Create a PR to `main`
 
-3. The GitHub Action (`.github/workflows/release.yml`) automatically:
-   - Detects the changeset on push to `main`
+4. When merged, the GitHub Action (`.github/workflows/release.yml`) automatically:
+   - Detects the changeset
    - Creates a "Version Packages" PR that bumps versions and updates CHANGELOGs
    - When that PR is merged, publishes all updated packages to npm
 
 ### Important
 
 - **Do NOT run `pnpm changeset version` locally** - let the GitHub Action handle it
+- **Do NOT manually create/edit CHANGELOG.md** - changesets handles it
 - The repo uses OIDC authentication with npm (via `id-token: write` permission) - no npm token secrets needed
 - Just create the changeset file, commit, push, and let automation handle the rest
 
