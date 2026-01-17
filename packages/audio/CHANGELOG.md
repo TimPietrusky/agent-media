@@ -1,5 +1,11 @@
 # @agent-media/audio
 
+## 0.2.1
+
+### Patch Changes
+
+- ac65ff4: Test OIDC publishing via GitHub Actions
+
 ## 0.2.0
 
 ### Minor Changes
