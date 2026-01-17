@@ -8,7 +8,7 @@ Media processing CLI for AI agents.
 
 ## Quick Start
 
-Requires an API key from one of these providers for AI features (generate, edit, remove-background, transcribe):
+Requires an API key from one of these providers:
 
 - [fal.ai](https://fal.ai/dashboard/keys) → `FAL_API_KEY`
 - [Replicate](https://replicate.com/account/api-tokens) → `REPLICATE_API_TOKEN`
