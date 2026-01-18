@@ -19,7 +19,7 @@ pnpm clean
 pnpm typecheck
 
 # Run the CLI locally during development
-node packages/cli/dist/index.js image <action> [options]
+node packages/agent-media/dist/index.js image <action> [options]
 ```
 
 ## Architecture
@@ -28,13 +28,13 @@ This is a **pnpm monorepo** with seven packages:
 
 ```
 packages/
-├── core/       # Shared types, provider registry, result builders, config
-├── image/      # Image action implementations (resize, convert, generate, remove-background, extend, edit)
-├── audio/      # Audio action implementations (extract, transcribe)
-├── video/      # Reserved for future video-specific actions
-├── providers/  # Provider implementations (local/Sharp, fal.ai, replicate, runpod)
-├── cli/        # Commander.js entry point (bin: agent-media)
-└── skills/     # Markdown skill definitions for agent discovery
+├── agent-media/  # Commander.js CLI entry point (bin: agent-media)
+├── core/         # Shared types, provider registry, result builders, config
+├── image/        # Image action implementations (resize, convert, generate, remove-background, extend, edit)
+├── audio/        # Audio action implementations (extract, transcribe)
+├── video/        # Reserved for future video-specific actions
+├── providers/    # Provider implementations (local/Sharp, fal.ai, replicate, runpod)
+└── skills/       # Markdown skill definitions for agent discovery
 ```
 
 ### Key Patterns
@@ -78,7 +78,7 @@ packages/
 1. Add action type to `ImageAction` in `packages/core/src/types/index.ts`
 2. Create action function in `packages/image/src/actions/<action>.ts`
 3. Export from `packages/image/src/actions/index.ts`
-4. Add CLI command in `packages/cli/src/index.ts`
+4. Add CLI command in `packages/agent-media/src/index.ts`
 5. Create skill definition in `packages/skills/`
 
 ### Adding a New Audio Action
@@ -86,7 +86,7 @@ packages/
 1. Add action type to `AudioAction` in `packages/core/src/types/index.ts`
 2. Create action function in `packages/audio/src/actions/<action>.ts`
 3. Export from `packages/audio/src/actions/index.ts`
-4. Add CLI command in `packages/cli/src/index.ts`
+4. Add CLI command in `packages/agent-media/src/index.ts`
 5. Create skill definition in `packages/skills/`
 
 ## Environment Variables

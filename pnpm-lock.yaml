@@ -12,26 +12,7 @@ importers:
         specifier: ^2.29.8
         version: 2.29.8(@types/node@22.19.6)
 
-  packages/audio:
-    dependencies:
-      '@agent-media/core':
-        specifier: workspace:*
-        version: link:../core
-      '@agent-media/providers':
-        specifier: workspace:*
-        version: link:../providers
-      ffmpeg-static:
-        specifier: ^5.3.0
-        version: 5.3.0
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.19.6
-      typescript:
-        specifier: ^5.7.0
-        version: 5.9.3
-
-  packages/cli:
+  packages/agent-media:
     dependencies:
       '@agent-media/audio':
         specifier: workspace:*
@@ -51,6 +32,25 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.6
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
+  packages/audio:
+    dependencies:
+      '@agent-media/core':
+        specifier: workspace:*
+        version: link:../core
+      '@agent-media/providers':
+        specifier: workspace:*
+        version: link:../providers
+      ffmpeg-static:
+        specifier: ^5.3.0
+        version: 5.3.0
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
