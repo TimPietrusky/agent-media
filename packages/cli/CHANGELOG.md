@@ -1,5 +1,11 @@
 # agent-media
 
+## 0.3.1
+
+### Patch Changes
+
+- fb32740: Clean up README: lowercase command headlines, remove duplicate provider sections
+
 ## 0.3.0
 
 ### Minor Changes
