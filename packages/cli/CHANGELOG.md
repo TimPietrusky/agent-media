@@ -1,5 +1,11 @@
 # agent-media
 
+## 0.3.2
+
+### Patch Changes
+
+- 834c9af: Sync CLI README with root README for correct npm display
+
 ## 0.3.1
 
 ### Patch Changes
