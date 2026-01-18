@@ -1,3 +1,8 @@
+---
+name: commit
+description: Commit workflow for agent-media - builds, typechecks, creates changeset, and pushes
+---
+
 # Commit Workflow
 
 When committing changes to this repository, follow these steps:

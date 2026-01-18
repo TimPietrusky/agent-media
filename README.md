@@ -69,9 +69,7 @@ pnpm install && pnpm build && pnpm link --global
 - Node.js >= 18.0.0
 - API key for AI features (generate, edit, remove-background, transcribe)
 
-## Commands
-
-### Image Commands
+## image
 
 ```bash
 agent-media image resize --in <path> [options]      # Resize image
@@ -82,7 +80,7 @@ agent-media image extend --in <path> --padding <px> --color <hex>  # Extend canv
 agent-media image edit --in <path> --prompt <text>  # Edit with prompt
 ```
 
-### Audio Commands
+## audio
 
 ```bash
 agent-media audio extract --in <video>              # Extract audio from video
