@@ -16,41 +16,41 @@ Requires an API key from one of these providers:
 
 ```bash
 # Generate an image
-npx agent-media image generate --prompt "a robot painting a sunset"
+npx agent-media@latest image generate --prompt "a robot painting a sunset"
 
 # Edit the generated image
-npx agent-media image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
+npx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
 
 # Remove background
-npx agent-media image remove-background --in .agent-media/edited_*.png
+npx agent-media@latest image remove-background --in .agent-media/edited_*.png
 
 # Convert to webp
-npx agent-media image convert --in .agent-media/nobg_*.png --format webp
+npx agent-media@latest image convert --in .agent-media/nobg_*.png --format webp
 ```
 
 **Video to transcript** (no API key needed for extract)
 
 ```bash
 # Extract audio from video (local, no API key)
-npx agent-media audio extract --in video.mp4
+npx agent-media@latest audio extract --in video.mp4
 
 # Transcribe with speaker identification
-npx agent-media audio transcribe --in .agent-media/extracted_*.mp3 --diarize
+npx agent-media@latest audio transcribe --in .agent-media/extracted_*.mp3 --diarize
 ```
 
 **Local processing** (no API key needed)
 
 ```bash
-npx agent-media image resize --in photo.jpg --width 800
-npx agent-media image convert --in photo.png --format webp
-npx agent-media image extend --in photo.jpg --padding 50 --color "#FFFFFF"
+npx agent-media@latest image resize --in photo.jpg --width 800
+npx agent-media@latest image convert --in photo.png --format webp
+npx agent-media@latest image extend --in photo.jpg --padding 50 --color "#FFFFFF"
 ```
 
 ## Installation
 
 ```bash
 # Use directly with npx (no install)
-npx agent-media --help
+npx agent-media@latest --help
 
 # Or install globally
 npm install -g agent-media
