@@ -1,6 +1,6 @@
 {
   "name": "agent-media",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Agent-first media toolkit CLI",
   "license": "Apache-2.0",
   "repository": {
