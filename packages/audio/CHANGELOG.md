@@ -1,5 +1,22 @@
 # @agent-media/audio
 
+## 0.4.0
+
+### Minor Changes
+
+- 5304b44: Add --name parameter for custom output filenames
+
+  - New `--name` option on all file-generating commands to specify custom output filename
+  - Without `--name`: output filename now derives from input filename (e.g., `photo_resized_<uuid>.png`)
+  - With `--name`: uses exact name provided, auto-corrects extension if wrong
+  - UUIDs in filenames are now without dashes for cleaner names
+
+### Patch Changes
+
+- Updated dependencies [5304b44]
+  - @agent-media/core@0.4.0
+  - @agent-media/providers@0.4.0
+
 ## 0.3.1
 
 ### Patch Changes
