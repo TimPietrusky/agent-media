@@ -1,2 +1,3 @@
-// Video actions - reserved for future video-specific actions
-// Note: transcribe has moved to @agent-media/audio
+// Video actions
+export { generate } from './generate.js';
+export type { VideoGenerateInput } from './generate.js';

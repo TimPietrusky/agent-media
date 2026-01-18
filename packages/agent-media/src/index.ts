@@ -5,7 +5,8 @@ import { Command } from 'commander';
 import { registerAllProviders } from '@agent-media/providers';
 import { resize, convert, removeBackground, generate, extend, edit, printResult } from '@agent-media/image';
 import { extract, transcribe } from '@agent-media/audio';
-import type { ImageFormat, AudioFormat } from '@agent-media/core';
+import { generate as videoGenerate } from '@agent-media/video';
+import type { ImageFormat, AudioFormat, VideoResolution, VideoFps } from '@agent-media/core';
 import { getConfig, mergeConfig } from '@agent-media/core';
 
 // Register all providers on startup
@@ -304,6 +305,57 @@ audioCommand
       language: options.language,
       numSpeakers: options.speakers,
       out: merged.outputDir,
+      provider: merged.provider,
+      model: options.model,
+    });
+
+    printResult(result);
+    process.exit(result.ok ? 0 : 1);
+  });
+
+// Video command group
+const videoCommand = program
+  .command('video')
+  .description('Video processing commands');
+
+// Video generate command
+videoCommand
+  .command('generate')
+  .description('Generate video from a text prompt, optionally animating an input image')
+  .requiredOption('--prompt <text>', 'Text description of the video to generate')
+  .option('--in <path>', 'Input image for image-to-video')
+  .option('--duration <seconds>', 'Duration in seconds (6, 8, 10, 12, 14, 16, 18, 20)', parseInt)
+  .option('--resolution <res>', 'Video resolution (720p, 1080p, 1440p, 2160p)')
+  .option('--fps <rate>', 'Frame rate (25 or 50)', parseInt)
+  .option('--audio', 'Generate audio track')
+  .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
+  .option('--provider <name>', 'Provider to use (fal, replicate)')
+  .option('--model <name>', 'Model to use (overrides provider default)')
+  .action(async (options: {
+    prompt: string;
+    in?: string;
+    duration?: number;
+    resolution?: string;
+    fps?: number;
+    audio?: boolean;
+    out?: string;
+    name?: string;
+    provider?: string;
+    model?: string;
+  }) => {
+    const config = getConfig();
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider, name: options.name });
+
+    const result = await videoGenerate({
+      prompt: options.prompt,
+      input: options.in,
+      duration: options.duration,
+      resolution: options.resolution as VideoResolution | undefined,
+      fps: options.fps as VideoFps | undefined,
+      audio: options.audio,
+      out: merged.outputDir,
+      name: merged.outputName,
       provider: merged.provider,
       model: options.model,
     });

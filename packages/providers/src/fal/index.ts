@@ -12,6 +12,7 @@ import type {
   TranscribeOptions,
   TranscriptionData,
   EditOptions,
+  VideoGenerateOptions,
 } from '@agent-media/core';
 import {
   createSuccess,
@@ -22,11 +23,12 @@ import {
   getOutputPath,
   ErrorCodes,
 } from '@agent-media/core';
+import { generateVideoFal } from '../video-gen/index.js';
 
 /**
  * Actions supported by the fal provider
  */
-const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe', 'edit'];
+const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe', 'edit', 'video-generate'];
 
 /**
  * Fal.ai provider for image generation and processing
@@ -64,6 +66,8 @@ export const falProvider: MediaProvider = {
           return await executeTranscribe(actionConfig.options, context, apiKey);
         case 'edit':
           return await executeEdit(actionConfig.options, context, apiKey);
+        case 'video-generate':
+          return await executeVideoGenerate(actionConfig.options, context, apiKey);
         default:
           return createError(
             ErrorCodes.INVALID_INPUT,
@@ -421,6 +425,69 @@ async function executeTranscribe(
     outputPath: outputPath,
     transcription,
   });
+}
+
+/**
+ * Execute video-generate action using fal.ai LTX-2 model
+ * Supports both text-to-video and image-to-video
+ */
+async function executeVideoGenerate(
+  options: VideoGenerateOptions,
+  context: ActionContext,
+  apiKey: string
+): Promise<MediaResult> {
+  const { prompt, input, duration, resolution, fps, generateAudio, model } = options;
+
+  if (!prompt) {
+    return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for video generation');
+  }
+
+  try {
+    const result = await generateVideoFal(
+      {
+        prompt,
+        inputImage: input?.source,
+        inputIsUrl: input?.isUrl,
+        duration,
+        resolution,
+        fps,
+        generateAudio,
+        model,
+      },
+      apiKey
+    );
+
+    // Download the generated video
+    const videoResponse = await fetch(result.url);
+    if (!videoResponse.ok) {
+      return createError(
+        ErrorCodes.NETWORK_ERROR,
+        `Failed to download generated video: ${videoResponse.statusText}`
+      );
+    }
+
+    const arrayBuffer = await videoResponse.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const outputFilename = resolveOutputFilename('mp4', 'generated', context.outputName, context.inputSource);
+    const outputPath = getOutputPath(context.outputDir, outputFilename);
+
+    await writeFile(outputPath, buffer);
+
+    const stats = await stat(outputPath);
+
+    return createSuccess({
+      mediaType: 'video',
+      action: 'video-generate',
+      provider: 'fal',
+      outputPath: outputPath,
+      mime: 'video/mp4',
+      bytes: stats.size,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return createError(ErrorCodes.PROVIDER_ERROR, message);
+  }
 }
 
 export default falProvider;

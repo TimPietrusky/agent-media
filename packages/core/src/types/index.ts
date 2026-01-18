@@ -14,6 +14,11 @@ export type ImageAction = 'resize' | 'convert' | 'remove-background' | 'generate
 export type AudioAction = 'extract' | 'transcribe';
 
 /**
+ * Supported video actions
+ */
+export type VideoAction = 'generate';
+
+/**
  * Supported audio output formats for extraction
  */
 export type AudioFormat = 'mp3' | 'wav';
@@ -147,6 +152,36 @@ export interface TranscribeOptions {
 }
 
 /**
+ * Supported video resolutions
+ */
+export type VideoResolution = '720p' | '1080p' | '1440p' | '2160p';
+
+/**
+ * Supported video frame rates
+ */
+export type VideoFps = 25 | 50;
+
+/**
+ * Options for video generate action
+ */
+export interface VideoGenerateOptions {
+  /** Text description of the video to generate */
+  prompt: string;
+  /** Input image for image-to-video (optional) */
+  input?: MediaInput;
+  /** Duration in seconds: 6, 8, 10, 12, 14, 16, 18, or 20 (default: 6) */
+  duration?: number;
+  /** Video resolution (default: 720p) */
+  resolution?: VideoResolution;
+  /** Frame rate (default: 25) */
+  fps?: VideoFps;
+  /** Generate audio track (default: false) */
+  generateAudio?: boolean;
+  /** Override default model */
+  model?: string;
+}
+
+/**
  * Successful result from a transcription operation
  */
 export interface TranscriptionSuccessResult {
@@ -169,7 +204,8 @@ export type ActionOptions =
   | { action: 'extend'; options: ExtendOptions }
   | { action: 'edit'; options: EditOptions }
   | { action: 'extract'; options: ExtractOptions }
-  | { action: 'transcribe'; options: TranscribeOptions };
+  | { action: 'transcribe'; options: TranscribeOptions }
+  | { action: 'video-generate'; options: VideoGenerateOptions };
 
 /**
  * Structured error information
