@@ -31,6 +31,10 @@
     "./runpod": {
       "types": "./dist/runpod/index.d.ts",
       "import": "./dist/runpod/index.js"
+    },
+    "./transformers": {
+      "types": "./dist/transformers/index.d.ts",
+      "import": "./dist/transformers/index.js"
     }
   },
   "files": [
@@ -44,11 +48,12 @@
   "dependencies": {
     "@agent-media/core": "workspace:*",
     "@ai-sdk/fal": "^2.0.6",
+    "@huggingface/transformers": "^3.3.3",
     "@ai-sdk/replicate": "^2.0.6",
     "@fal-ai/client": "^1.8.3",
     "@runpod/ai-sdk-provider": "^1.1.0",
     "ai": "^6.0.33",
-    "sharp": "^0.33.0"
+    "sharp": "^0.34.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

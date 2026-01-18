@@ -84,7 +84,18 @@ agent-media audio transcribe --in .agent-media/extracted_xxx.mp3
 
 ## Providers
 
-This action requires an external provider:
+### transformers.js
+
+Runs locally on CPU, no API key required.
+
+- Uses Moonshine model (5x faster than Whisper)
+- Models downloaded on first use (~100MB)
+- Does NOT support diarization — use fal or replicate for speaker identification
+- You may see a `mutex lock failed` error — ignore it, the output is correct if `"ok": true`
+
+```bash
+agent-media audio transcribe --in audio.mp3 --provider transformers
+```
 
 ### fal
 

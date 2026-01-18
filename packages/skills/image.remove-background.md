@@ -48,8 +48,24 @@ agent-media image remove-background --in portrait.jpg --provider replicate
 
 ## Providers
 
-This action requires an external provider:
-- **fal** - Requires `FAL_API_KEY`
-- **replicate** - Requires `REPLICATE_API_TOKEN`
+### transformers.js
 
-The local and runpod providers do not support background removal.
+Runs locally on CPU, no API key required.
+
+- Uses `Xenova/modnet` model
+- Models downloaded on first use (~25MB)
+- You may see a `mutex lock failed` error — ignore it, the output is correct if `"ok": true`
+
+```bash
+agent-media image remove-background --in portrait.jpg --provider transformers
+```
+
+### fal
+
+- Requires `FAL_API_KEY`
+- Uses `birefnet/v2` model
+
+### replicate
+
+- Requires `REPLICATE_API_TOKEN`
+- Uses `birefnet` model
