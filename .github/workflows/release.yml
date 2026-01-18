@@ -4,18 +4,20 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+# Changesets needs write to create/version PRs; OIDC needs id-token: write
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      id-token: write
-    environment: npm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,21 +30,20 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: https://registry.npmjs.org
+
+      # Ensure recent npm for OIDC + provenance support
+      - name: Update npm
+        run: npm i -g npm@latest
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify npm auth
-        run: npm whoami --registry https://registry.npmjs.org || echo "Not authenticated yet (expected before publish)"
+      - name: Build
+        run: pnpm build
 
-      - name: Debug OIDC
-        run: |
-          echo "Repository: ${{ github.repository }}"
-          echo "Workflow: ${{ github.workflow }}"
-          echo "Environment: npm"
-          cat .npmrc || echo "No .npmrc in root"
-
+      # Changesets will call `npm publish` under the hood.
+      # NPM_CONFIG_ACCESS=public forces --access public for scoped packages.
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
@@ -52,4 +53,4 @@ jobs:
           title: "chore: release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+          NPM_CONFIG_ACCESS: public
