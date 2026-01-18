@@ -31,22 +31,25 @@ imageCommand
   .option('--width <pixels>', 'Target width in pixels', parseInt)
   .option('--height <pixels>', 'Target height in pixels', parseInt)
   .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
   .option('--provider <name>', 'Provider to use (local, fal, replicate, runpod)')
   .action(async (options: {
     in: string;
     width?: number;
     height?: number;
     out?: string;
+    name?: string;
     provider?: string;
   }) => {
     const config = getConfig();
-    const merged = mergeConfig(config, { out: options.out, provider: options.provider });
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider, name: options.name });
 
     const result = await resize({
       input: options.in,
       width: options.width,
       height: options.height,
       out: merged.outputDir,
+      name: merged.outputName,
       provider: merged.provider,
     });
 
@@ -65,6 +68,7 @@ imageCommand
   .option('--width <pixels>', 'Target width in pixels', parseInt)
   .option('--height <pixels>', 'Target height in pixels', parseInt)
   .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
   .option('--provider <name>', 'Provider to use (local, fal, replicate, runpod)')
   .action(async (options: {
     in: string;
@@ -74,10 +78,11 @@ imageCommand
     width?: number;
     height?: number;
     out?: string;
+    name?: string;
     provider?: string;
   }) => {
     const config = getConfig();
-    const merged = mergeConfig(config, { out: options.out, provider: options.provider });
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider, name: options.name });
 
     const result = await convert({
       input: options.in,
@@ -87,6 +92,7 @@ imageCommand
       width: options.width,
       height: options.height,
       out: merged.outputDir,
+      name: merged.outputName,
       provider: merged.provider,
     });
 
@@ -100,20 +106,23 @@ imageCommand
   .description('Remove the background from an image')
   .requiredOption('--in <path>', 'Input file path or URL')
   .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
   .option('--provider <name>', 'Provider to use (fal, replicate)')
   .option('--model <name>', 'Model to use (overrides provider default)')
   .action(async (options: {
     in: string;
     out?: string;
+    name?: string;
     provider?: string;
     model?: string;
   }) => {
     const config = getConfig();
-    const merged = mergeConfig(config, { out: options.out, provider: options.provider });
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider, name: options.name });
 
     const result = await removeBackground({
       input: options.in,
       out: merged.outputDir,
+      name: merged.outputName,
       provider: merged.provider,
       model: options.model,
     });
@@ -131,6 +140,7 @@ imageCommand
   .option('--height <pixels>', 'Height of the generated image', parseInt)
   .option('--count <number>', 'Number of images to generate', parseInt)
   .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
   .option('--provider <name>', 'Provider to use (fal, replicate, runpod)')
   .option('--model <name>', 'Model to use (overrides provider default, e.g., fal-ai/flux-2)')
   .action(async (options: {
@@ -139,11 +149,12 @@ imageCommand
     height?: number;
     count?: number;
     out?: string;
+    name?: string;
     provider?: string;
     model?: string;
   }) => {
     const config = getConfig();
-    const merged = mergeConfig(config, { out: options.out, provider: options.provider });
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider, name: options.name });
 
     const result = await generate({
       prompt: options.prompt,
@@ -151,6 +162,7 @@ imageCommand
       height: options.height,
       count: options.count,
       out: merged.outputDir,
+      name: merged.outputName,
       provider: merged.provider,
       model: options.model,
     });
@@ -168,6 +180,7 @@ imageCommand
   .requiredOption('--color <hex>', 'Background color for extended area (e.g., "#E4ECF8"). Also flattens transparency.')
   .option('--dpi <number>', 'DPI/density for output image (default: 300)', parseInt)
   .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
   .option('--provider <name>', 'Provider to use (local)')
   .action(async (options: {
     in: string;
@@ -175,10 +188,11 @@ imageCommand
     color: string;
     dpi?: number;
     out?: string;
+    name?: string;
     provider?: string;
   }) => {
     const config = getConfig();
-    const merged = mergeConfig(config, { out: options.out, provider: options.provider });
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider, name: options.name });
 
     const result = await extend({
       input: options.in,
@@ -186,6 +200,7 @@ imageCommand
       color: options.color,
       dpi: options.dpi,
       out: merged.outputDir,
+      name: merged.outputName,
       provider: merged.provider,
     });
 
@@ -200,22 +215,25 @@ imageCommand
   .requiredOption('--in <path>', 'Input file path or URL')
   .requiredOption('--prompt <text>', 'Text description of the desired edit')
   .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
   .option('--provider <name>', 'Provider to use (fal, replicate, runpod)')
   .option('--model <name>', 'Model to use (overrides provider default, e.g., fal-ai/flux-2/edit)')
   .action(async (options: {
     in: string;
     prompt: string;
     out?: string;
+    name?: string;
     provider?: string;
     model?: string;
   }) => {
     const config = getConfig();
-    const merged = mergeConfig(config, { out: options.out, provider: options.provider });
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider, name: options.name });
 
     const result = await edit({
       input: options.in,
       prompt: options.prompt,
       out: merged.outputDir,
+      name: merged.outputName,
       provider: merged.provider,
       model: options.model,
     });
@@ -236,18 +254,21 @@ audioCommand
   .requiredOption('--in <path>', 'Input video file path or URL')
   .option('--format <format>', 'Output audio format (mp3, wav)', 'mp3')
   .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
   .action(async (options: {
     in: string;
     format?: string;
     out?: string;
+    name?: string;
   }) => {
     const config = getConfig();
-    const merged = mergeConfig(config, { out: options.out });
+    const merged = mergeConfig(config, { out: options.out, name: options.name });
 
     const result = await extract({
       input: options.in,
       format: (options.format as AudioFormat) || 'mp3',
       out: merged.outputDir,
+      name: merged.outputName,
     });
 
     printResult(result);

@@ -17,7 +17,7 @@ import {
   createError,
   createTranscriptionSuccess,
   ensureOutputDir,
-  generateOutputFilename,
+  resolveOutputFilename,
   getOutputPath,
   ErrorCodes,
 } from '@agent-media/core';
@@ -100,7 +100,7 @@ async function executeGenerate(
     size: `${width}x${height}`,
   });
 
-  const outputFilename = generateOutputFilename('webp', 'generated');
+  const outputFilename = resolveOutputFilename('webp', 'generated', context.outputName);
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
   await writeFile(outputPath, image.uint8Array);
@@ -224,7 +224,7 @@ async function executeEdit(
   const arrayBuffer = await imageResponse.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
-  const outputFilename = generateOutputFilename('webp', 'edited');
+  const outputFilename = resolveOutputFilename('webp', 'edited', context.outputName, context.inputSource);
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
   await writeFile(outputPath, buffer);
@@ -279,7 +279,7 @@ async function executeRemoveBackground(
     },
   });
 
-  const outputFilename = generateOutputFilename('png', 'nobg');
+  const outputFilename = resolveOutputFilename('png', 'nobg', context.outputName, context.inputSource);
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
   await writeFile(outputPath, image.uint8Array);
@@ -458,7 +458,7 @@ async function executeTranscribe(
   };
 
   // Save transcription to JSON file
-  const outputFilename = generateOutputFilename('json', 'transcription');
+  const outputFilename = resolveOutputFilename('json', 'transcription', context.outputName, context.inputSource);
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
   await writeFile(outputPath, JSON.stringify(transcription, null, 2));

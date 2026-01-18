@@ -13,7 +13,7 @@ import {
   createSuccess,
   createError,
   ensureOutputDir,
-  generateOutputFilename,
+  resolveOutputFilename,
   getOutputPath,
   ErrorCodes,
 } from '@agent-media/core';
@@ -94,7 +94,7 @@ async function executeGenerate(
     size: `${width}x${height}`,
   });
 
-  const outputFilename = generateOutputFilename('png', 'generated');
+  const outputFilename = resolveOutputFilename('png', 'generated', context.outputName);
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
   await writeFile(outputPath, image.uint8Array);
@@ -152,7 +152,7 @@ async function executeEdit(
     },
   });
 
-  const outputFilename = generateOutputFilename('png', 'edited');
+  const outputFilename = resolveOutputFilename('png', 'edited', context.outputName, context.inputSource);
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
   await writeFile(outputPath, image.uint8Array);
