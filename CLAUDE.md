@@ -55,9 +55,9 @@ packages/
 
 **Local Provider**: Uses Sharp for zero-config image operations (resize, convert) without external APIs.
 
-**Fal Provider**: Uses @ai-sdk/fal for image generation (flux/schnell) and background removal (birefnet/v2). Requires `FAL_API_KEY`.
+**Fal Provider**: Uses @ai-sdk/fal for image generation (fal-ai/flux-2), editing (fal-ai/flux-2/edit), and background removal (birefnet/v2). Requires `FAL_API_KEY`.
 
-**Replicate Provider**: Uses @ai-sdk/replicate for image generation (flux-schnell) and background removal (birefnet v1). Requires `REPLICATE_API_TOKEN`. Note: Replicate only has BiRefNet v1 (legacy), while fal has v2.
+**Replicate Provider**: Uses @ai-sdk/replicate for image generation (black-forest-labs/flux-2-dev), editing (black-forest-labs/flux-kontext-dev), and background removal (birefnet). Requires `REPLICATE_API_TOKEN`.
 
 **Runpod Provider**: Uses @runpod/ai-sdk-provider for image generation (alibaba/wan-2.6) and image editing (google/nano-banana-pro-edit). Requires `RUNPOD_API_KEY`.
 
@@ -113,6 +113,9 @@ git diff --stat
 ```
 
 ### 3. Create a changeset file
+
+**IMPORTANT:** The CLI package is named `agent-media` (NOT `@agent-media/cli`).
+
 Create `.changeset/<descriptive-name>.md`:
 ```markdown
 ---
@@ -121,7 +124,7 @@ Create `.changeset/<descriptive-name>.md`:
 "@agent-media/providers": patch|minor|major
 "@agent-media/image": patch|minor|major
 "@agent-media/audio": patch|minor|major
-"@agent-media/cli": patch|minor|major
+"@agent-media/video": patch|minor|major
 ---
 
 Brief description of changes
@@ -196,6 +199,20 @@ This project uses **changesets** for versioning and automated npm publishing via
 **Adding a new package to npm:**
 1. New packages must be published manually the first time: `cd packages/<name> && npm publish --access public`
 2. Future releases via GitHub Actions will work automatically (OIDC auth, no npm token needed)
+
+## README Sync
+
+**IMPORTANT:** The root `README.md` must be copied to `packages/cli/README.md` whenever it changes.
+
+npm displays the README from the published package directory, not the repository root. Since the CLI package (`agent-media`) is published from `packages/cli/`, that's where npm looks for the README.
+
+**When updating README.md:**
+```bash
+# After editing the root README.md, always sync to CLI package:
+cp README.md packages/cli/README.md
+```
+
+Include this copy in the same commit/PR as your README changes.
 
 ## Design Principles
 
