@@ -10,12 +10,14 @@ Media processing CLI for AI agents.
 
 ### Local processing (no API key needed)
 
-Uses [Sharp](https://sharp.pixelplumbing.com/) for fast local image processing. We're working on adding [transformers.js](https://huggingface.co/docs/transformers.js) for local AI features soon.
+Uses [Sharp](https://sharp.pixelplumbing.com/) for fast local image processing.
+
+We're working on adding [transformers.js](https://github.com/huggingface/transformers.js) for local AI features soon.
 
 ```bash
-bunx agent-media@latest image resize --in photo.jpg --width 800
-bunx agent-media@latest image convert --in photo.png --format webp
-bunx agent-media@latest image extend --in photo.jpg --padding 50 --color "#FFFFFF"
+bunx agent-media@latest image resize --in sunset-mountains.jpg --width 800
+bunx agent-media@latest image convert --in sunset-mountains.png --format webp
+bunx agent-media@latest image extend --in sunset-mountains.jpg --padding 50 --color "#FFFFFF"
 bunx agent-media@latest audio extract --in video.mp4
 ```
 
@@ -85,32 +87,38 @@ pnpm install && pnpm build && pnpm link --global
 - Node.js >= 18.0.0
 - API key for AI features (generate, edit, remove-background, transcribe)
 
+---
+
 ## image
 
 ```bash
-agent-media@latest image resize --in <path> [options]      # Resize image
-agent-media@latest image convert --in <path> --format <f>  # Convert format
-agent-media@latest image remove-background --in <path>     # Remove background
-agent-media@latest image generate --prompt <text>          # Generate from prompt
-agent-media@latest image extend --in <path> --padding <px> --color <hex>  # Extend canvas
-agent-media@latest image edit --in <path> --prompt <text>  # Edit with prompt
+# Resize image
+agent-media@latest image resize --in <path> [options]
+
+# Convert format
+agent-media@latest image convert --in <path> --format <f>
+
+# Extend canvas with padding
+agent-media@latest image extend --in <path> --padding <px> --color <hex>
+
+# Generate image from text
+agent-media@latest image generate --prompt <text>
+
+# Edit image with text prompt
+agent-media@latest image edit --in <path> --prompt <text>
+
+# Remove background
+agent-media@latest image remove-background --in <path>
 ```
-
-## audio
-
-```bash
-agent-media@latest audio extract --in <video>              # Extract audio from video
-agent-media@latest audio transcribe --in <audio>           # Transcribe audio to text
-```
-
----
 
 ### resize
 
+*local*
+
 ```bash
-agent-media@latest image resize --in photo.jpg --width 800
-agent-media@latest image resize --in photo.jpg --height 600
-agent-media@latest image resize --in photo.jpg --width 800 --height 600
+agent-media@latest image resize --in sunset-mountains.jpg --width 800
+agent-media@latest image resize --in sunset-mountains.jpg --height 600
+agent-media@latest image resize --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.jpg --width 800
 ```
 
 | Option | Description |
@@ -119,14 +127,15 @@ agent-media@latest image resize --in photo.jpg --width 800 --height 600
 | `--width <px>` | Target width in pixels |
 | `--height <px>` | Target height in pixels |
 | `--out <dir>` | Output directory |
-| `--provider <name>` | Provider (local) |
 
 ### convert
 
+*local*
+
 ```bash
-agent-media@latest image convert --in photo.png --format webp
-agent-media@latest image convert --in photo.jpg --format png
-agent-media@latest image convert --in photo.png --format jpg --quality 90
+agent-media@latest image convert --in sunset-mountains.png --format webp
+agent-media@latest image convert --in sunset-mountains.jpg --format png
+agent-media@latest image convert --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.png --format jpg --quality 90
 ```
 
 | Option | Description |
@@ -135,22 +144,29 @@ agent-media@latest image convert --in photo.png --format jpg --quality 90
 | `--format <f>` | Output format: png, jpg, webp (required) |
 | `--quality <n>` | Quality 1-100 for lossy formats (default: 80) |
 | `--out <dir>` | Output directory |
-| `--provider <name>` | Provider (local) |
 
-### remove-background
+### extend
+
+*local*
+
+Extend image canvas by adding padding on all sides with a solid background color.
 
 ```bash
-agent-media@latest image remove-background --in portrait.jpg
-agent-media@latest image remove-background --in https://example.com/photo.jpg
+agent-media@latest image extend --in sunset-mountains.jpg --padding 50 --color "#E4ECF8"
+agent-media@latest image extend --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.png --padding 100 --color "#FFFFFF"
 ```
 
 | Option | Description |
 |--------|-------------|
 | `--in <path>` | Input file path or URL (required) |
+| `--padding <px>` | Padding size in pixels to add on all sides (required) |
+| `--color <hex>` | Background color for extended area (required). Also flattens transparency. |
+| `--dpi <n>` | DPI/density for output image (default: 300) |
 | `--out <dir>` | Output directory |
-| `--provider <name>` | Provider (fal, replicate) |
 
 ### generate
+
+*API key required*
 
 ```bash
 agent-media@latest image generate --prompt "a cat wearing a hat"
@@ -166,31 +182,15 @@ agent-media@latest image generate --prompt "sunset over mountains" --width 1024 
 | `--provider <name>` | Provider (fal, replicate, runpod) |
 | `--model <name>` | Model override (e.g., `fal-ai/flux-2`, `black-forest-labs/flux-2-dev`) |
 
-### extend
-
-Extend image canvas by adding padding on all sides with a solid background color.
-
-```bash
-agent-media@latest image extend --in photo.jpg --padding 50 --color "#E4ECF8"
-agent-media@latest image extend --in photo.png --padding 100 --color "#FFFFFF" --dpi 300
-```
-
-| Option | Description |
-|--------|-------------|
-| `--in <path>` | Input file path or URL (required) |
-| `--padding <px>` | Padding size in pixels to add on all sides (required) |
-| `--color <hex>` | Background color for extended area (required). Also flattens transparency. |
-| `--dpi <n>` | DPI/density for output image (default: 300) |
-| `--out <dir>` | Output directory |
-| `--provider <name>` | Provider (local) |
-
 ### edit
+
+*API key required*
 
 Edit an image using a text prompt (image-to-image).
 
 ```bash
-agent-media@latest image edit --in photo.jpg --prompt "make the sky more vibrant"
-agent-media@latest image edit --in portrait.jpg --prompt "add sunglasses"
+agent-media@latest image edit --in sunset-mountains.jpg --prompt "make the sky more vibrant"
+agent-media@latest image edit --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/portrait-headshot.png --prompt "add sunglasses"
 ```
 
 | Option | Description |
@@ -201,9 +201,38 @@ agent-media@latest image edit --in portrait.jpg --prompt "add sunglasses"
 | `--provider <name>` | Provider (fal, replicate, runpod) |
 | `--model <name>` | Model override (e.g., `fal-ai/flux-2/edit`) |
 
-### audio extract
+### remove-background
 
-Extract audio track from a video file. Uses local ffmpeg, no API key needed.
+*API key required*
+
+```bash
+agent-media@latest image remove-background --in portrait-headshot.png
+agent-media@latest image remove-background --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/portrait-headshot.png
+```
+
+| Option | Description |
+|--------|-------------|
+| `--in <path>` | Input file path or URL (required) |
+| `--out <dir>` | Output directory |
+| `--provider <name>` | Provider (fal, replicate) |
+
+---
+
+## audio
+
+```bash
+# Extract audio from video
+agent-media@latest audio extract --in <video>
+
+# Transcribe audio to text
+agent-media@latest audio transcribe --in <audio>
+```
+
+### extract
+
+*local*
+
+Extract audio track from a video file.
 
 ```bash
 agent-media@latest audio extract --in video.mp4
@@ -216,7 +245,9 @@ agent-media@latest audio extract --in video.mp4 --format wav
 | `--format <f>` | Output format: mp3, wav (default: mp3) |
 | `--out <dir>` | Output directory |
 
-### audio transcribe
+### transcribe
+
+*API key required*
 
 Transcribe audio to text with timestamps. Supports speaker identification.
 
@@ -234,6 +265,8 @@ agent-media@latest audio transcribe --in audio.mp3 --diarize --speakers 2
 | `--out <dir>` | Output directory |
 | `--provider <name>` | Provider (fal, replicate) |
 | `--model <name>` | Model override |
+
+---
 
 ## Output Format
 

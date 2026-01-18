@@ -50,9 +50,9 @@ Resize to exact dimensions:
 agent-media image resize --in photo.jpg --width 1024 --height 768
 ```
 
-Resize from URL:
+Resize with custom output:
 ```bash
-agent-media image resize --in https://example.com/image.png --width 500
+agent-media image resize --in image.png --width 500 --out ./resized
 ```
 
 ## Providers
