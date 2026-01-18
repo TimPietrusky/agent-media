@@ -187,23 +187,15 @@ This project uses **changesets** for versioning and automated npm publishing via
 - The repo uses OIDC authentication with npm (via `id-token: write` permission) - no npm token secrets needed
 - Just create the changeset file, commit, push, and let automation handle the rest
 
-### GitHub & npm Setup (for new maintainers)
+### GitHub repo settings (for new maintainers)
 
-**GitHub repo settings required:**
 - Settings → Actions → General → Workflow permissions:
   - ✅ "Read and write permissions"
   - ✅ "Allow GitHub Actions to create and approve pull requests"
-- Settings → Environments: Create an environment named `npm`
-
-**npm trusted publishers (for each package):**
-- Repository: `/agent-media`
-- Workflow: `release.yml`
-- Environment: `npm`
 
 **Adding a new package to npm:**
 1. New packages must be published manually the first time: `cd packages/<name> && npm publish --access public`
-2. Then configure trusted publishers on npm for that package
-3. Future releases via GitHub Actions will work automatically
+2. Future releases via GitHub Actions will work automatically (OIDC auth, no npm token needed)
 
 ## Design Principles
 
