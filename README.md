@@ -8,60 +8,25 @@ Media processing CLI for AI agents.
 
 ## Quick Start
 
-### Local processing (no API key needed)
-
-Uses [Sharp](https://sharp.pixelplumbing.com/) for image operations and [transformers.js](https://huggingface.co/docs/transformers.js) for local AI (background removal, transcription).
-
 ```bash
-bunx agent-media@latest image resize --in sunset-mountains.jpg --width 800
-bunx agent-media@latest image convert --in sunset-mountains.png --format webp
-bunx agent-media@latest image extend --in sunset-mountains.jpg --padding 50 --color "#FFFFFF"
-bunx agent-media@latest image remove-background --in portrait-headshot.png --provider transformers
-bunx agent-media@latest audio extract --in video.mp4
-bunx agent-media@latest audio transcribe --in audio.mp3 --provider transformers
-```
+# Image operations (local, no API key needed)
+bunx agent-media@latest image resize --in photo.jpg --width 800
+bunx agent-media@latest image convert --in photo.png --format webp
+bunx agent-media@latest image extend --in photo.jpg --padding 50 --color "#FFFFFF"
 
-> **Note**: You may see a `mutex lock failed` error with `--provider transformers` — ignore it, the output is correct if JSON shows `"ok": true`.
-
-### AI-powered features
-
-Requires an API key from one of these providers:
-
-- [fal.ai](https://fal.ai/dashboard/keys) → `FAL_API_KEY`
-- [Replicate](https://replicate.com/account/api-tokens) → `REPLICATE_API_TOKEN`
-- [Runpod](https://www.runpod.io/console/user/settings) → `RUNPOD_API_KEY`
-
-### bunx
-
-```bash
-# Generate an image
+# AI features (uses API key if set, otherwise local)
 bunx agent-media@latest image generate --prompt "a robot painting a sunset"
+bunx agent-media@latest image edit --in photo.jpg --prompt "add a rainbow"
+bunx agent-media@latest image remove-background --in portrait.png
 
-# Edit the generated image
-bunx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
-
-# Remove background
-bunx agent-media@latest image remove-background --in .agent-media/edited_*.png
-
-# Transcribe with speaker identification
+# Audio
+bunx agent-media@latest audio extract --in video.mp4
 bunx agent-media@latest audio transcribe --in audio.mp3 --diarize
 ```
 
-### npx
+**Provider auto-selection**: If you have an API key set (`FAL_API_KEY`, `REPLICATE_API_TOKEN`, or `RUNPOD_API_KEY`), cloud providers are used. Otherwise, local processing via [Sharp](https://sharp.pixelplumbing.com/) and [transformers.js](https://huggingface.co/docs/transformers.js) is used where available. Override with `--provider <name>`.
 
-```bash
-# Generate an image
-npx agent-media@latest image generate --prompt "a robot painting a sunset"
-
-# Edit the generated image
-npx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
-
-# Remove background
-npx agent-media@latest image remove-background --in .agent-media/edited_*.png
-
-# Transcribe with speaker identification
-npx agent-media@latest audio transcribe --in audio.mp3 --diarize
-```
+Get an API key: [fal.ai](https://fal.ai/dashboard/keys) | [Replicate](https://replicate.com/account/api-tokens) | [Runpod](https://www.runpod.io/console/user/settings)
 
 ## Installation
 
