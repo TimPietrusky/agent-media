@@ -1,5 +1,11 @@
 # agent-media
 
+## 0.3.3
+
+### Patch Changes
+
+- 88183a9: Rename packages/cli to packages/agent-media for consistency with package name
+
 ## 0.3.2
 
 ### Patch Changes
