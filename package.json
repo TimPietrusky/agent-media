@@ -13,8 +13,8 @@
     "clean": "pnpm -r clean",
     "typecheck": "pnpm -r typecheck",
     "changeset": "changeset",
-    "version": "changeset version",
-    "release": "pnpm build && changeset publish"
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish"
   },
   "keywords": [
     "media",

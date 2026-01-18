@@ -8,8 +8,8 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
-# Changesets needs write to create/version PRs; OIDC needs id-token: write
 permissions:
+  # Changesets needs write to create/version PRs; OIDC needs id-token: write
   contents: write
   pull-requests: write
   id-token: write
@@ -19,24 +19,25 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repo
         uses: actions/checkout@v4
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: latest
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
           registry-url: https://registry.npmjs.org
 
       # Ensure recent npm for OIDC + provenance support
-      - name: Update npm
+      - name: Ensure recent npm
         run: npm i -g npm@latest
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build
@@ -44,13 +45,14 @@ jobs:
 
       # Changesets will call `npm publish` under the hood.
       # NPM_CONFIG_ACCESS=public forces --access public for scoped packages.
-      - name: Create Release Pull Request or Publish
+      - name: Create Release PR or Publish to npm (OIDC)
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: pnpm release
-          commit: "chore: release"
-          title: "chore: release"
+          publish: pnpm changeset:publish
+          version: pnpm changeset:version
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_ACCESS: public
