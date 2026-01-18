@@ -1,5 +1,11 @@
 # agent-media
 
+## 0.3.5
+
+### Patch Changes
+
+- ebe7581: Restructure README: group by image/audio, mark each command as _local_ or _API key required_
+
 ## 0.3.4
 
 ### Patch Changes
