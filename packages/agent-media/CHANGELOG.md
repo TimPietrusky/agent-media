@@ -1,5 +1,11 @@
 # agent-media
 
+## 0.3.4
+
+### Patch Changes
+
+- cb263ce: Add bunx examples to README (bunx first, then npx) and ensure all npx/bunx commands use @latest
+
 ## 0.3.3
 
 ### Patch Changes
