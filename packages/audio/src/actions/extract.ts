@@ -8,7 +8,7 @@ import {
   createSuccess,
   createError,
   ensureOutputDir,
-  generateOutputFilename,
+  resolveOutputFilename,
   getOutputPath,
   ErrorCodes,
 } from '@agent-media/core';
@@ -25,6 +25,8 @@ export interface ExtractInput {
   format?: AudioOutputFormat;
   /** Output directory (overrides default) */
   out?: string;
+  /** Output filename (extension auto-added if missing) */
+  name?: string;
 }
 
 /**
@@ -68,7 +70,7 @@ function runFfmpeg(args: string[]): Promise<{ stdout: string; stderr: string }> 
  * Uses ffmpeg-static - binary is bundled, no external installation required
  */
 export async function extract(options: ExtractInput): Promise<MediaResult> {
-  const { input: inputPath, format = 'mp3', out } = options;
+  const { input: inputPath, format = 'mp3', out, name } = options;
   const outputDir = out ?? process.cwd() + '/.agent-media';
 
   try {
@@ -96,7 +98,7 @@ export async function extract(options: ExtractInput): Promise<MediaResult> {
     }
 
     // Generate output filename
-    const outputFilename = generateOutputFilename(format, 'extracted');
+    const outputFilename = resolveOutputFilename(format, 'extracted', name, inputPath);
     const outputPath = getOutputPath(outputDir, outputFilename);
 
     // Build ffmpeg arguments

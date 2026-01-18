@@ -213,6 +213,10 @@ export interface ActionContext {
   outputDir: string;
   /** Explicitly selected provider (overrides auto-detection) */
   provider?: string;
+  /** Custom output filename (extension auto-corrected) */
+  outputName?: string;
+  /** Original input path/URL for deriving default filename */
+  inputSource?: string;
 }
 
 /**

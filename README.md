@@ -331,35 +331,6 @@ Use `--model <name>` to override the default model for any command.
 | `HUGGINGFACE_ACCESS_TOKEN` | For transcription with speaker ID (replicate only) | [huggingface.co](https://huggingface.co/settings/tokens) |
 | `AGENT_MEDIA_DIR` | Output directory (default: `.agent-media/`) | - |
 
-## Usage with AI Agents
-
-### Just ask the agent
-
-```
-Use agent-media@latest to resize this image to 800px wide.
-Run agent-media@latest --help to see available commands.
-```
-
-### AGENTS.md / CLAUDE.md
-
-Add to your project instructions:
-
-```markdown
-## Media Processing
-
-Use `agent-media@latest` for image and audio operations. Run `agent-media@latest --help` for commands.
-
-- `agent-media@latest image resize --in <path> --width <px>` - Resize image
-- `agent-media@latest image convert --in <path> --format <f>` - Convert format
-- `agent-media@latest image generate --prompt <text>` - Generate image
-- `agent-media@latest image edit --in <path> --prompt <text>` - Edit image
-- `agent-media@latest image remove-background --in <path>` - Remove background
-- `agent-media@latest audio extract --in <video>` - Extract audio from video
-- `agent-media@latest audio transcribe --in <audio>` - Transcribe audio
-
-All commands output JSON with `ok: true/false` and exit 0/1.
-```
-
 ## Roadmap
 
 - [x] Local CPU background removal via transformers.js/ONNX (zero API keys)

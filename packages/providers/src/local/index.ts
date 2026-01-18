@@ -15,7 +15,7 @@ import {
   createSuccess,
   createError,
   ensureOutputDir,
-  generateOutputFilename,
+  resolveOutputFilename,
   getOutputPath,
   ErrorCodes,
 } from '@agent-media/core';
@@ -155,9 +155,11 @@ async function executeResize(
     withoutEnlargement: true,
   });
 
-  const outputFilename = generateOutputFilename(
+  const outputFilename = resolveOutputFilename(
     getFormatExtension(outputFormat),
-    'resized'
+    'resized',
+    context.outputName,
+    context.inputSource
   );
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
@@ -243,9 +245,11 @@ async function executeConvert(
     density: dpi,
   });
 
-  const outputFilename = generateOutputFilename(
+  const outputFilename = resolveOutputFilename(
     getFormatExtension(format),
-    'converted'
+    'converted',
+    context.outputName,
+    context.inputSource
   );
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
@@ -336,7 +340,12 @@ async function executeExtend(
     density: dpi,
   });
 
-  const outputFilename = generateOutputFilename('png', 'extended');
+  const outputFilename = resolveOutputFilename(
+    'png',
+    'extended',
+    context.outputName,
+    context.inputSource
+  );
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
   await pipeline.toFile(outputPath);

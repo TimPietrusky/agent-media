@@ -9,7 +9,7 @@ import type {
 import {
   createSuccess,
   createError,
-  generateOutputFilename,
+  resolveOutputFilename,
   getOutputPath,
   ErrorCodes,
 } from '@agent-media/core';
@@ -131,7 +131,7 @@ export async function executeBackgroundRemoval(
       },
     });
 
-    const outputFilename = generateOutputFilename('png', 'nobg');
+    const outputFilename = resolveOutputFilename('png', 'nobg', context.outputName, context.inputSource);
     const outputPath = getOutputPath(context.outputDir, outputFilename);
 
     // Save as PNG
