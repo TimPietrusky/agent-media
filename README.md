@@ -3,8 +3,8 @@
 Media processing CLI for AI agents.
 
 - **Image**: generate, edit, remove-background, resize, convert, extend
-- **Video**: extract audio
-- **Audio**: transcribe (with speaker identification)
+- **Video**: generate (text-to-video and image-to-video)
+- **Audio**: extract from video, transcribe (with speaker identification)
 
 ## Quick Start
 
@@ -45,6 +45,12 @@ bunx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "a
 # Remove background
 bunx agent-media@latest image remove-background --in .agent-media/edited_*.png
 
+# Generate a video from text
+bunx agent-media@latest video generate --prompt "ocean waves crashing on rocks"
+
+# Generate a video from an image (image-to-video with audio)
+bunx agent-media@latest video generate --in portrait.png --prompt "person smiles and waves hello" --audio
+
 # Transcribe with speaker identification
 bunx agent-media@latest audio transcribe --in audio.mp3 --diarize
 ```
@@ -60,6 +66,12 @@ npx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "ad
 
 # Remove background
 npx agent-media@latest image remove-background --in .agent-media/edited_*.png
+
+# Generate a video from text
+npx agent-media@latest video generate --prompt "ocean waves crashing on rocks"
+
+# Generate a video from an image (image-to-video with audio)
+npx agent-media@latest video generate --in portrait.png --prompt "person smiles and waves hello" --audio
 
 # Transcribe with speaker identification
 npx agent-media@latest audio transcribe --in audio.mp3 --diarize
@@ -89,7 +101,7 @@ pnpm install && pnpm build && pnpm link --global
 ## Requirements
 
 - Node.js >= 18.0.0
-- API key for AI features (generate, edit, remove-background, transcribe)
+- API key for AI features (image generate/edit, video generate, remove-background, transcribe)
 
 ---
 
@@ -222,6 +234,51 @@ agent-media@latest image remove-background --in https://ytrzap04kkm0giml.public.
 
 ---
 
+## video
+
+```bash
+# Generate video from text
+agent-media@latest video generate --prompt <text>
+
+# Generate video from image (animate an image)
+agent-media@latest video generate --in <image> --prompt <text>
+```
+
+### generate
+
+*API key required*
+
+Generate video from a text prompt. Optionally provide an input image to animate it (image-to-video). The prompt describes what should happen in the video.
+
+```bash
+# Text-to-video
+agent-media@latest video generate --prompt "a cat walking through a garden"
+
+# Image-to-video (animate an image)
+agent-media@latest video generate --in portrait.png --prompt "person smiles and waves hello"
+
+# With audio generation
+agent-media@latest video generate --prompt "fireworks in the night sky" --audio --duration 10
+
+# Higher resolution
+agent-media@latest video generate --prompt "ocean waves" --resolution 1080p
+```
+
+| Option | Description |
+|--------|-------------|
+| `--prompt <text>` | Text description of the video (required) |
+| `--in <path>` | Input image for image-to-video (optional) |
+| `--duration <s>` | Duration: 6, 8, 10, 12, 14, 16, 18, 20 (default: 6) |
+| `--resolution <r>` | Resolution: 720p, 1080p, 1440p, 2160p (default: 720p) |
+| `--fps <n>` | Frame rate: 25, 50 (default: 25) |
+| `--audio` | Generate audio track |
+| `--out <dir>` | Output directory |
+| `--name <filename>` | Output filename (extension auto-added) |
+| `--provider <name>` | Provider (fal, replicate) |
+| `--model <name>` | Model override |
+
+---
+
 ## audio
 
 ```bash
@@ -306,13 +363,13 @@ Exit code is `0` on success, `1` on error.
 
 ### Default Models
 
-| Provider | resize | convert | extend | generate | edit | remove-background | transcribe |
-|----------|--------|---------|--------|----------|------|-------------------|------------|
-| **local** | ✓ | ✓ | ✓ | - | - | - | - |
-| **transformers** | - | - | - | - | - | `Xenova/modnet` | `moonshine-base` |
-| **fal** | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/wizper` |
-| **replicate** | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | WhisperX |
-| **runpod** | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - |
+| Provider | resize | convert | extend | image generate | image edit | remove-background | video generate | transcribe |
+|----------|--------|---------|--------|----------------|------------|-------------------|----------------|------------|
+| **local** | ✓ | ✓ | ✓ | - | - | - | - | - |
+| **transformers** | - | - | - | - | - | `Xenova/modnet` | - | `moonshine-base` |
+| **fal** | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/ltx-2` | `fal-ai/wizper` |
+| **replicate** | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | WhisperX |
+| **runpod** | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | - |
 
 Use `--model <name>` to override the default model for any command.
 
@@ -337,5 +394,5 @@ Use `--model <name>` to override the default model for any command.
 
 - [x] Local CPU background removal via transformers.js/ONNX (zero API keys)
 - [x] Local CPU transcription via transformers.js/ONNX (zero API keys)
-- [ ] Video processing actions
+- [x] Video generation (text-to-video and image-to-video)
 - [ ] Batch processing support
