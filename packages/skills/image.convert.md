@@ -48,9 +48,9 @@ Convert to high-quality JPEG:
 agent-media image convert --in photo.png --format jpg --quality 95
 ```
 
-Convert from URL:
+Convert with custom output directory:
 ```bash
-agent-media image convert --in https://example.com/image.png --format webp
+agent-media image convert --in image.png --format webp --out ./converted
 ```
 
 ## Providers

@@ -46,9 +46,9 @@ Extract audio as WAV:
 agent-media audio extract --in video.mp4 --format wav
 ```
 
-Extract from URL:
+Extract as MP3 with format flag:
 ```bash
-agent-media audio extract --in "https://example.com/video.mp4" --format mp3
+agent-media audio extract --in video.mp4 --format mp3
 ```
 
 Custom output directory:
