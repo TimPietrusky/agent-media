@@ -1,5 +1,12 @@
 # @agent-media/image
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [d0377dd]
+  - @agent-media/providers@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

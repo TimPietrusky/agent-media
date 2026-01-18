@@ -1,5 +1,16 @@
 # @agent-media/providers
 
+## 0.3.0
+
+### Minor Changes
+
+- d0377dd: Add transformers.js provider for local ML inference without API keys
+
+  - `remove-background` using Xenova/modnet model
+  - `transcribe` using Moonshine model (5x faster than Whisper)
+  - Models downloaded on first use and cached locally
+  - Updated sharp to ^0.34.1 to match transformers.js requirements
+
 ## 0.2.0
 
 ### Minor Changes
