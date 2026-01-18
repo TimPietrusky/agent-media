@@ -43,6 +43,8 @@ export {
   generateOutputFilename,
   getOutputPath,
   mergeConfig,
+  resolveOutputFilename,
+  extractBasename,
 } from './config/index.js';
 export type { AgentMediaConfig, MergedConfig } from './config/index.js';
 

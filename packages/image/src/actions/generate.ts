@@ -12,6 +12,8 @@ export interface GenerateInput {
   count?: number;
   /** Output directory (overrides default) */
   out?: string;
+  /** Output filename (extension auto-added if missing) */
+  name?: string;
   /** Provider to use (overrides auto-detection) */
   provider?: string;
   /** Model to use (overrides provider default) */
@@ -26,6 +28,8 @@ export async function generate(options: GenerateInput): Promise<MediaResult> {
   const context: ActionContext = {
     outputDir: options.out ?? process.cwd() + '/.agent-media',
     provider: options.provider,
+    outputName: options.name,
+    // No inputSource for generate - uses generic prefix
   };
 
   return executeAction(

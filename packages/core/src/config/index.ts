@@ -1,5 +1,6 @@
 import { mkdir } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { join, resolve, basename } from 'node:path';
+import { randomUUID } from 'node:crypto';
 
 /**
  * Default output directory name
@@ -45,7 +46,7 @@ export async function ensureOutputDir(outputDir: string): Promise<void> {
 }
 
 /**
- * Generate a unique output filename
+ * Generate a unique output filename (legacy function for backwards compatibility)
  */
 export function generateOutputFilename(
   extension: string,
@@ -54,6 +55,53 @@ export function generateOutputFilename(
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 8);
   return `${prefix}_${timestamp}_${random}.${extension}`;
+}
+
+/**
+ * Extract base filename without extension from a path or URL
+ */
+export function extractBasename(source: string): string {
+  // Handle URLs
+  if (source.startsWith('http://') || source.startsWith('https://')) {
+    const url = new URL(source);
+    const pathname = url.pathname;
+    const filename = pathname.split('/').pop() || 'file';
+    return filename.replace(/\.[^.]+$/, '');
+  }
+  // Handle local paths
+  const filename = basename(source);
+  return filename.replace(/\.[^.]+$/, '');
+}
+
+/**
+ * Resolve output filename based on context
+ * - If customName provided: use it (with correct extension)
+ * - If inputSource provided: derive from input filename
+ * - Otherwise: use action prefix
+ */
+export function resolveOutputFilename(
+  extension: string,
+  actionPrefix: string,
+  customName?: string,
+  inputSource?: string
+): string {
+  if (customName) {
+    // Strip any existing extension and add the correct one
+    const baseName = customName.replace(/\.[^.]+$/, '');
+    return `${baseName}.${extension}`;
+  }
+
+  // Generate UUID without dashes for cleaner filenames
+  const uuid = randomUUID().replace(/-/g, '');
+
+  if (inputSource) {
+    // Derive from input: {basename}_{action}_{uuid}.{ext}
+    const baseName = extractBasename(inputSource);
+    return `${baseName}_${actionPrefix}_${uuid}.${extension}`;
+  }
+
+  // No input (e.g., generate): {action}_{uuid}.{ext}
+  return `${actionPrefix}_${uuid}.${extension}`;
 }
 
 /**
@@ -72,6 +120,7 @@ export function getOutputPath(
 export interface MergedConfig {
   outputDir: string;
   provider?: string;
+  outputName?: string;
 }
 
 /**
@@ -83,10 +132,12 @@ export function mergeConfig(
   cliOptions: {
     out?: string;
     provider?: string;
+    name?: string;
   }
 ): MergedConfig {
   return {
     outputDir: cliOptions.out ? resolve(cliOptions.out) : config.outputDir,
     provider: cliOptions.provider,
+    outputName: cliOptions.name,
   };
 }

@@ -9,7 +9,7 @@ import type {
 import {
   createError,
   createTranscriptionSuccess,
-  generateOutputFilename,
+  resolveOutputFilename,
   getOutputPath,
   ErrorCodes,
 } from '@agent-media/core';
@@ -173,7 +173,7 @@ export async function executeTranscribe(
     };
 
     // Save transcription to JSON file
-    const outputFilename = generateOutputFilename('json', 'transcription');
+    const outputFilename = resolveOutputFilename('json', 'transcription', context.outputName, context.inputSource);
     const outputPath = getOutputPath(context.outputDir, outputFilename);
 
     await writeFile(outputPath, JSON.stringify(transcription, null, 2));
