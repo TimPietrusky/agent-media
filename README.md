@@ -16,12 +16,14 @@ Uses [Sharp](https://sharp.pixelplumbing.com/) for image operations and [transfo
 bunx agent-media@latest image resize --in sunset-mountains.jpg --width 800
 bunx agent-media@latest image convert --in sunset-mountains.png --format webp
 bunx agent-media@latest image extend --in sunset-mountains.jpg --padding 50 --color "#FFFFFF"
-bunx agent-media@latest image remove-background --in portrait-headshot.png --provider transformers
+bunx agent-media@latest image remove-background --in portrait-headshot.png
 bunx agent-media@latest audio extract --in video.mp4
-bunx agent-media@latest audio transcribe --in audio.mp3 --provider transformers
+bunx agent-media@latest audio transcribe --in audio.mp3
 ```
 
-> **Note**: You may see a `mutex lock failed` error with `--provider transformers` — ignore it, the output is correct if JSON shows `"ok": true`.
+> **Note**: You may see a `mutex lock failed` error with local AI processing — ignore it, the output is correct if JSON shows `"ok": true`.
+
+**Provider auto-selection**: Without an API key, local processing is used. With an API key (`FAL_API_KEY`, `REPLICATE_API_TOKEN`, or `RUNPOD_API_KEY`), cloud providers are used. Override with `--provider <name>`.
 
 ### AI-powered features
 
