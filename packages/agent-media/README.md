@@ -8,11 +8,42 @@ Media processing CLI for AI agents.
 
 ## Quick Start
 
+### Local processing (no API key needed)
+
+Uses [Sharp](https://sharp.pixelplumbing.com/) for fast local image processing. We're working on adding [transformers.js](https://huggingface.co/docs/transformers.js) for local AI features soon.
+
+```bash
+bunx agent-media@latest image resize --in photo.jpg --width 800
+bunx agent-media@latest image convert --in photo.png --format webp
+bunx agent-media@latest image extend --in photo.jpg --padding 50 --color "#FFFFFF"
+bunx agent-media@latest audio extract --in video.mp4
+```
+
+### AI-powered features
+
 Requires an API key from one of these providers:
 
 - [fal.ai](https://fal.ai/dashboard/keys) → `FAL_API_KEY`
 - [Replicate](https://replicate.com/account/api-tokens) → `REPLICATE_API_TOKEN`
 - [Runpod](https://www.runpod.io/console/user/settings) → `RUNPOD_API_KEY`
+
+### bunx
+
+```bash
+# Generate an image
+bunx agent-media@latest image generate --prompt "a robot painting a sunset"
+
+# Edit the generated image
+bunx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
+
+# Remove background
+bunx agent-media@latest image remove-background --in .agent-media/edited_*.png
+
+# Transcribe with speaker identification
+bunx agent-media@latest audio transcribe --in audio.mp3 --diarize
+```
+
+### npx
 
 ```bash
 # Generate an image
@@ -24,32 +55,17 @@ npx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "ad
 # Remove background
 npx agent-media@latest image remove-background --in .agent-media/edited_*.png
 
-# Convert to webp
-npx agent-media@latest image convert --in .agent-media/nobg_*.png --format webp
-```
-
-**Video to transcript** (no API key needed for extract)
-
-```bash
-# Extract audio from video (local, no API key)
-npx agent-media@latest audio extract --in video.mp4
-
 # Transcribe with speaker identification
-npx agent-media@latest audio transcribe --in .agent-media/extracted_*.mp3 --diarize
-```
-
-**Local processing** (no API key needed)
-
-```bash
-npx agent-media@latest image resize --in photo.jpg --width 800
-npx agent-media@latest image convert --in photo.png --format webp
-npx agent-media@latest image extend --in photo.jpg --padding 50 --color "#FFFFFF"
+npx agent-media@latest audio transcribe --in audio.mp3 --diarize
 ```
 
 ## Installation
 
 ```bash
-# Use directly with npx (no install)
+# Use directly with bunx (no install)
+bunx agent-media@latest --help
+
+# Or with npx
 npx agent-media@latest --help
 
 # Or install globally
@@ -72,19 +88,19 @@ pnpm install && pnpm build && pnpm link --global
 ## image
 
 ```bash
-agent-media image resize --in <path> [options]      # Resize image
-agent-media image convert --in <path> --format <f>  # Convert format
-agent-media image remove-background --in <path>     # Remove background
-agent-media image generate --prompt <text>          # Generate from prompt
-agent-media image extend --in <path> --padding <px> --color <hex>  # Extend canvas
-agent-media image edit --in <path> --prompt <text>  # Edit with prompt
+agent-media@latest image resize --in <path> [options]      # Resize image
+agent-media@latest image convert --in <path> --format <f>  # Convert format
+agent-media@latest image remove-background --in <path>     # Remove background
+agent-media@latest image generate --prompt <text>          # Generate from prompt
+agent-media@latest image extend --in <path> --padding <px> --color <hex>  # Extend canvas
+agent-media@latest image edit --in <path> --prompt <text>  # Edit with prompt
 ```
 
 ## audio
 
 ```bash
-agent-media audio extract --in <video>              # Extract audio from video
-agent-media audio transcribe --in <audio>           # Transcribe audio to text
+agent-media@latest audio extract --in <video>              # Extract audio from video
+agent-media@latest audio transcribe --in <audio>           # Transcribe audio to text
 ```
 
 ---
@@ -92,9 +108,9 @@ agent-media audio transcribe --in <audio>           # Transcribe audio to text
 ### resize
 
 ```bash
-agent-media image resize --in photo.jpg --width 800
-agent-media image resize --in photo.jpg --height 600
-agent-media image resize --in photo.jpg --width 800 --height 600
+agent-media@latest image resize --in photo.jpg --width 800
+agent-media@latest image resize --in photo.jpg --height 600
+agent-media@latest image resize --in photo.jpg --width 800 --height 600
 ```
 
 | Option | Description |
@@ -108,9 +124,9 @@ agent-media image resize --in photo.jpg --width 800 --height 600
 ### convert
 
 ```bash
-agent-media image convert --in photo.png --format webp
-agent-media image convert --in photo.jpg --format png
-agent-media image convert --in photo.png --format jpg --quality 90
+agent-media@latest image convert --in photo.png --format webp
+agent-media@latest image convert --in photo.jpg --format png
+agent-media@latest image convert --in photo.png --format jpg --quality 90
 ```
 
 | Option | Description |
@@ -124,8 +140,8 @@ agent-media image convert --in photo.png --format jpg --quality 90
 ### remove-background
 
 ```bash
-agent-media image remove-background --in portrait.jpg
-agent-media image remove-background --in https://example.com/photo.jpg
+agent-media@latest image remove-background --in portrait.jpg
+agent-media@latest image remove-background --in https://example.com/photo.jpg
 ```
 
 | Option | Description |
@@ -137,8 +153,8 @@ agent-media image remove-background --in https://example.com/photo.jpg
 ### generate
 
 ```bash
-agent-media image generate --prompt "a cat wearing a hat"
-agent-media image generate --prompt "sunset over mountains" --width 1024 --height 768
+agent-media@latest image generate --prompt "a cat wearing a hat"
+agent-media@latest image generate --prompt "sunset over mountains" --width 1024 --height 768
 ```
 
 | Option | Description |
@@ -155,8 +171,8 @@ agent-media image generate --prompt "sunset over mountains" --width 1024 --heigh
 Extend image canvas by adding padding on all sides with a solid background color.
 
 ```bash
-agent-media image extend --in photo.jpg --padding 50 --color "#E4ECF8"
-agent-media image extend --in photo.png --padding 100 --color "#FFFFFF" --dpi 300
+agent-media@latest image extend --in photo.jpg --padding 50 --color "#E4ECF8"
+agent-media@latest image extend --in photo.png --padding 100 --color "#FFFFFF" --dpi 300
 ```
 
 | Option | Description |
@@ -173,8 +189,8 @@ agent-media image extend --in photo.png --padding 100 --color "#FFFFFF" --dpi 30
 Edit an image using a text prompt (image-to-image).
 
 ```bash
-agent-media image edit --in photo.jpg --prompt "make the sky more vibrant"
-agent-media image edit --in portrait.jpg --prompt "add sunglasses"
+agent-media@latest image edit --in photo.jpg --prompt "make the sky more vibrant"
+agent-media@latest image edit --in portrait.jpg --prompt "add sunglasses"
 ```
 
 | Option | Description |
@@ -190,8 +206,8 @@ agent-media image edit --in portrait.jpg --prompt "add sunglasses"
 Extract audio track from a video file. Uses local ffmpeg, no API key needed.
 
 ```bash
-agent-media audio extract --in video.mp4
-agent-media audio extract --in video.mp4 --format wav
+agent-media@latest audio extract --in video.mp4
+agent-media@latest audio extract --in video.mp4 --format wav
 ```
 
 | Option | Description |
@@ -205,8 +221,8 @@ agent-media audio extract --in video.mp4 --format wav
 Transcribe audio to text with timestamps. Supports speaker identification.
 
 ```bash
-agent-media audio transcribe --in audio.mp3
-agent-media audio transcribe --in audio.mp3 --diarize --speakers 2
+agent-media@latest audio transcribe --in audio.mp3
+agent-media@latest audio transcribe --in audio.mp3 --diarize --speakers 2
 ```
 
 | Option | Description |
@@ -284,8 +300,8 @@ Use `--model <name>` to override the default model for any command.
 ### Just ask the agent
 
 ```
-Use agent-media to resize this image to 800px wide.
-Run agent-media --help to see available commands.
+Use agent-media@latest to resize this image to 800px wide.
+Run agent-media@latest --help to see available commands.
 ```
 
 ### AGENTS.md / CLAUDE.md
@@ -295,15 +311,15 @@ Add to your project instructions:
 ```markdown
 ## Media Processing
 
-Use `agent-media` for image and audio operations. Run `agent-media --help` for commands.
+Use `agent-media@latest` for image and audio operations. Run `agent-media@latest --help` for commands.
 
-- `agent-media image resize --in <path> --width <px>` - Resize image
-- `agent-media image convert --in <path> --format <f>` - Convert format
-- `agent-media image generate --prompt <text>` - Generate image
-- `agent-media image edit --in <path> --prompt <text>` - Edit image
-- `agent-media image remove-background --in <path>` - Remove background
-- `agent-media audio extract --in <video>` - Extract audio from video
-- `agent-media audio transcribe --in <audio>` - Transcribe audio
+- `agent-media@latest image resize --in <path> --width <px>` - Resize image
+- `agent-media@latest image convert --in <path> --format <f>` - Convert format
+- `agent-media@latest image generate --prompt <text>` - Generate image
+- `agent-media@latest image edit --in <path> --prompt <text>` - Edit image
+- `agent-media@latest image remove-background --in <path>` - Remove background
+- `agent-media@latest audio extract --in <video>` - Extract audio from video
+- `agent-media@latest audio transcribe --in <audio>` - Transcribe audio
 
 All commands output JSON with `ok: true/false` and exit 0/1.
 ```
