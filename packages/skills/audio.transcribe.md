@@ -60,9 +60,9 @@ Transcription with specific language and speaker count:
 agent-media audio transcribe --in podcast.mp3 --diarize --language en --speakers 3
 ```
 
-Transcribe from URL:
+Transcribe with custom output:
 ```bash
-agent-media audio transcribe --in "https://example.com/audio.mp3"
+agent-media audio transcribe --in audio.mp3 --out ./transcripts
 ```
 
 Use specific provider:
