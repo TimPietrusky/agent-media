@@ -19,11 +19,15 @@ import {
   getOutputPath,
   ErrorCodes,
 } from '@agent-media/core';
+import { executeBackgroundRemoval } from '../transformers/background-removal.js';
+import { executeTranscribe } from '../transformers/transcribe.js';
 
 /**
  * Actions supported by the local provider
+ * - Sharp: resize, convert, extend
+ * - Transformers.js: remove-background, transcribe
  */
-const SUPPORTED_ACTIONS = ['resize', 'convert', 'extend'];
+const SUPPORTED_ACTIONS = ['resize', 'convert', 'extend', 'remove-background', 'transcribe'];
 
 /**
  * MIME types for image formats
@@ -69,9 +73,9 @@ async function getInputBuffer(
 }
 
 /**
- * Local provider using sharp for image manipulation
- * Supports: resize, convert
- * Zero external dependencies beyond sharp
+ * Local provider for zero-API-key operations
+ * - Sharp: resize, convert, extend
+ * - Transformers.js: remove-background, transcribe
  */
 export const localProvider: MediaProvider = {
   name: 'local',
@@ -94,6 +98,20 @@ export const localProvider: MediaProvider = {
           return await executeConvert(actionConfig.options, context);
         case 'extend':
           return await executeExtend(actionConfig.options, context);
+        case 'remove-background': {
+          const result = await executeBackgroundRemoval(actionConfig.options, context);
+          if (result.ok) {
+            return { ...result, provider: 'local' };
+          }
+          return result;
+        }
+        case 'transcribe': {
+          const result = await executeTranscribe(actionConfig.options, context);
+          if (result.ok) {
+            return { ...result, provider: 'local' };
+          }
+          return result;
+        }
         default:
           return createError(
             ErrorCodes.INVALID_INPUT,

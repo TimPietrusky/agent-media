@@ -33,7 +33,7 @@ packages/
 ├── image/        # Image action implementations (resize, convert, generate, remove-background, extend, edit)
 ├── audio/        # Audio action implementations (extract, transcribe)
 ├── video/        # Reserved for future video-specific actions
-├── providers/    # Provider implementations (local/Sharp, fal.ai, replicate, runpod)
+├── providers/    # Provider implementations (local/Sharp, transformers, fal.ai, replicate, runpod)
 └── skills/       # Markdown skill definitions for agent discovery
 ```
 
@@ -60,6 +60,10 @@ packages/
 **Replicate Provider**: Uses @ai-sdk/replicate for image generation (black-forest-labs/flux-2-dev), editing (black-forest-labs/flux-kontext-dev), and background removal (birefnet). Requires `REPLICATE_API_TOKEN`.
 
 **Runpod Provider**: Uses @runpod/ai-sdk-provider for image generation (alibaba/wan-2.6) and image editing (google/nano-banana-pro-edit). Requires `RUNPOD_API_KEY`.
+
+**Transformers.js Provider**: Uses @huggingface/transformers for local ML inference. No API keys required. Models are downloaded on first use and cached locally.
+- `remove-background` - Xenova/modnet (default)
+- `transcribe` - Moonshine (default, 5x faster than Whisper), Whisper, Distil-Whisper
 
 **Input Support**: All providers support both local file paths and URLs as input. Local files are handled via:
 - Local provider: `createReadStream()` → Buffer → Sharp
@@ -239,3 +243,7 @@ This toolkit is designed for AI agents to understand and use. Follow these namin
   - ✅ `--color` (clear: specifies a color)
 
 - **Descriptions must be complete**: Include all side effects in command descriptions. Example: "Also flattens any transparency to this color."
+
+## Known Issues (Safe to Ignore)
+
+**`mutex lock failed` error with `--provider transformers`**: Ignore it, the output is correct if JSON shows `"ok": true`.

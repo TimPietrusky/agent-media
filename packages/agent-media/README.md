@@ -10,16 +10,18 @@ Media processing CLI for AI agents.
 
 ### Local processing (no API key needed)
 
-Uses [Sharp](https://sharp.pixelplumbing.com/) for fast local image processing.
-
-We're working on adding [transformers.js](https://github.com/huggingface/transformers.js) for local AI features soon.
+Uses [Sharp](https://sharp.pixelplumbing.com/) for image operations and [transformers.js](https://huggingface.co/docs/transformers.js) for local AI (background removal, transcription).
 
 ```bash
 bunx agent-media@latest image resize --in sunset-mountains.jpg --width 800
 bunx agent-media@latest image convert --in sunset-mountains.png --format webp
 bunx agent-media@latest image extend --in sunset-mountains.jpg --padding 50 --color "#FFFFFF"
+bunx agent-media@latest image remove-background --in portrait-headshot.png --provider transformers
 bunx agent-media@latest audio extract --in video.mp4
+bunx agent-media@latest audio transcribe --in audio.mp3 --provider transformers
 ```
+
+> **Note**: You may see a `mutex lock failed` error with `--provider transformers` — ignore it, the output is correct if JSON shows `"ok": true`.
 
 ### AI-powered features
 
@@ -305,6 +307,7 @@ Exit code is `0` on success, `1` on error.
 | Provider | resize | convert | extend | generate | edit | remove-background | transcribe |
 |----------|--------|---------|--------|----------|------|-------------------|------------|
 | **local** | ✓ | ✓ | ✓ | - | - | - | - |
+| **transformers** | - | - | - | - | - | `Xenova/modnet` | `moonshine-base` |
 | **fal** | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/wizper` |
 | **replicate** | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | WhisperX |
 | **runpod** | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - |
@@ -359,6 +362,7 @@ All commands output JSON with `ok: true/false` and exit 0/1.
 
 ## Roadmap
 
-- [ ] Local CPU background removal via transformers.js/ONNX (zero API keys)
+- [x] Local CPU background removal via transformers.js/ONNX (zero API keys)
+- [x] Local CPU transcription via transformers.js/ONNX (zero API keys)
 - [ ] Video processing actions
 - [ ] Batch processing support
