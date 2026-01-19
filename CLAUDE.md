@@ -24,7 +24,7 @@ node packages/agent-media/dist/index.js image <action> [options]
 
 ## Architecture
 
-This is a **pnpm monorepo** with seven packages:
+This is a **pnpm monorepo** with six packages:
 
 ```
 packages/
@@ -33,8 +33,9 @@ packages/
 ├── image/        # Image action implementations (resize, convert, generate, remove-background, extend, edit)
 ├── audio/        # Audio action implementations (extract, transcribe)
 ├── video/        # Reserved for future video-specific actions
-├── providers/    # Provider implementations (local, fal.ai, replicate, runpod)
-└── skills/       # Markdown skill definitions for agent discovery
+└── providers/    # Provider implementations (local, fal.ai, replicate, runpod)
+
+skills/           # SKILL.md definitions for AI agent discovery (npx skills add agntswrm/agent-media)
 ```
 
 ### Key Patterns
@@ -81,7 +82,7 @@ packages/
 2. Create action function in `packages/image/src/actions/<action>.ts`
 3. Export from `packages/image/src/actions/index.ts`
 4. Add CLI command in `packages/agent-media/src/index.ts`
-5. Create skill definition in `packages/skills/`
+5. Create skill definition in `skills/<action-name>/SKILL.md`
 
 ### Adding a New Audio Action
 
@@ -89,7 +90,7 @@ packages/
 2. Create action function in `packages/audio/src/actions/<action>.ts`
 3. Export from `packages/audio/src/actions/index.ts`
 4. Add CLI command in `packages/agent-media/src/index.ts`
-5. Create skill definition in `packages/skills/`
+5. Create skill definition in `skills/<action-name>/SKILL.md`
 
 ## Environment Variables
 
