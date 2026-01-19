@@ -1,5 +1,25 @@
 # agent-media
 
+## 0.6.1
+
+### Patch Changes
+
+- cac474a: Update Replicate transcription and documentation
+
+  - Switch Replicate transcription to thomasmol/whisper-diarization model
+  - Remove HUGGINGFACE_ACCESS_TOKEN requirement (no longer needed)
+  - Add woman-portrait.png (16:9 portrait for video generation)
+  - Add woman-greeting.mp4 (talking avatar video example)
+  - Add woman-greeting.mp3 (extracted speech audio example)
+  - Rename portrait-headshot.png to man-portrait.png for consistency
+  - Update all documentation with new file names and URL examples
+
+- Updated dependencies [cac474a]
+  - @agent-media/providers@0.5.1
+  - @agent-media/audio@0.4.2
+  - @agent-media/image@0.3.2
+  - @agent-media/video@0.2.1
+
 ## 0.6.0
 
 ### Minor Changes
