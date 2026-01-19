@@ -6,6 +6,31 @@ Media processing CLI for AI agents.
 - **Video**: generate (text-to-video and image-to-video)
 - **Audio**: extract from video, transcribe (with speaker identification)
 
+## Installation
+
+### Global
+
+```bash
+npm install -g agent-media@latest
+```
+
+### From Source
+
+```bash
+git clone https://github.com/TimPietrusky/agent-media
+cd agent-media
+pnpm install && pnpm build && pnpm link --global
+```
+
+### Via bunx / npx
+
+Run directly without installing:
+
+```bash
+bunx agent-media@latest --help
+npx agent-media@latest --help
+```
+
 ## Quick Start
 
 ```bash
@@ -29,34 +54,6 @@ agent-media audio extract --in .agent-media/generated_*.mp4
 
 # Transcribe the audio
 agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
-```
-
-## Installation
-
-### bunx
-
-```bash
-bunx agent-media@latest --help
-```
-
-### npx
-
-```bash
-npx agent-media@latest --help
-```
-
-### Global install
-
-```bash
-npm install -g agent-media@latest
-```
-
-### From Source
-
-```bash
-git clone https://github.com/TimPietrusky/agent-media
-cd agent-media
-pnpm install && pnpm build && pnpm link --global
 ```
 
 ## Requirements
