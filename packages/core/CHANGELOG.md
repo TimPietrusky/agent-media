@@ -1,5 +1,11 @@
 # @agent-media/core
 
+## 0.5.1
+
+### Patch Changes
+
+- b0f02ba: Update repository URLs to agntswrm organization
+
 ## 0.5.0
 
 ### Minor Changes

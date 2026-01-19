@@ -1,5 +1,13 @@
 # @agent-media/providers
 
+## 0.5.2
+
+### Patch Changes
+
+- b0f02ba: Update repository URLs to agntswrm organization
+- Updated dependencies [b0f02ba]
+  - @agent-media/core@0.5.1
+
 ## 0.5.1
 
 ### Patch Changes

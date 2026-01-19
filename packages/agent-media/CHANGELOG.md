@@ -1,5 +1,17 @@
 # agent-media
 
+## 0.6.2
+
+### Patch Changes
+
+- b0f02ba: Update repository URLs to agntswrm organization
+- Updated dependencies [b0f02ba]
+  - @agent-media/core@0.5.1
+  - @agent-media/providers@0.5.2
+  - @agent-media/image@0.3.3
+  - @agent-media/audio@0.4.3
+  - @agent-media/video@0.2.2
+
 ## 0.6.1
 
 ### Patch Changes
