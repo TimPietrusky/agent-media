@@ -1,5 +1,13 @@
 # @agent-media/image
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [6097a41]
+  - @agent-media/core@0.5.0
+  - @agent-media/providers@0.5.0
+
 ## 0.3.0
 
 ### Minor Changes
