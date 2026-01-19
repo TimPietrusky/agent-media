@@ -42,6 +42,7 @@
     "@agent-media/core": "workspace:*",
     "@agent-media/image": "workspace:*",
     "@agent-media/providers": "workspace:*",
+    "@agent-media/video": "workspace:*",
     "commander": "^12.0.0",
     "dotenv": "^17.2.3"
   },
