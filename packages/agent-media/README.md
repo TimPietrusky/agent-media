@@ -61,11 +61,11 @@ agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
 - Node.js >= 18.0.0
 - API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), or [Runpod](https://www.runpod.io/console/user/settings) for AI features
 
-**Local processing** (no API key): resize, convert, extend, audio extract
+**Local processing** (no API key): resize, convert, extend, audio extract, remove-background, transcribe
 
-**Cloud processing** (API key required): image generate, image edit, remove-background, video generate, transcribe
+**Cloud processing** (API key required): image generate, image edit, video generate
 
-> **Note**: You may see a `mutex lock failed` error with `--provider transformers` — ignore it, the output is correct if JSON shows `"ok": true`.
+> **Note**: You may see a `mutex lock failed` error when using local remove-background or transcribe — ignore it, the output is correct if JSON shows `"ok": true`.
 
 ---
 
@@ -320,11 +320,13 @@ Exit code is `0` on success, `1` on error.
 
 | Provider | resize | convert | extend | image generate | image edit | remove-background | video generate | transcribe |
 |----------|--------|---------|--------|----------------|------------|-------------------|----------------|------------|
-| **local** | ✓ | ✓ | ✓ | - | - | - | - | - |
-| **transformers** | - | - | - | - | - | `Xenova/modnet` | - | `moonshine-base` |
+| **local** | ✓* | ✓* | ✓* | - | - | `Xenova/modnet`** | - | `moonshine-base`** |
 | **fal** | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/ltx-2` | `fal-ai/wizper` |
 | **replicate** | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | `whisper-diarization` |
 | **runpod** | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | - |
+
+\* Powered by [Sharp](https://sharp.pixelplumbing.com/) for fast image processing
+\** Powered by [Transformers.js](https://huggingface.co/docs/transformers.js) for local ML inference (models downloaded on first use)
 
 Use `--model <name>` to override the default model for any command.
 
@@ -346,7 +348,7 @@ Use `--model <name>` to override the default model for any command.
 
 ## Roadmap
 
-- [x] Local CPU background removal via transformers.js/ONNX (zero API keys)
-- [x] Local CPU transcription via transformers.js/ONNX (zero API keys)
+- [x] Local background removal (zero API keys)
+- [x] Local transcription (zero API keys)
 - [x] Video generation (text-to-video and image-to-video)
 - [ ] Batch processing support

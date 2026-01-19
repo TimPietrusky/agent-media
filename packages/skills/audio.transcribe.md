@@ -19,7 +19,7 @@ agent-media audio transcribe --in <path> [options]
 | `--language` | No | Language code (auto-detected if not provided) |
 | `--speakers` | No | Number of speakers hint for diarization |
 | `--out` | No | Output directory (default: `.agent-media/`) |
-| `--provider` | No | Provider to use (fal, replicate) |
+| `--provider` | No | Provider to use (local, fal, replicate) |
 
 ## Output
 
@@ -84,9 +84,9 @@ agent-media audio transcribe --in .agent-media/extracted_xxx.mp3
 
 ## Providers
 
-### transformers.js
+### local
 
-Runs locally on CPU, no API key required.
+Runs locally on CPU using [Transformers.js](https://huggingface.co/docs/transformers.js), no API key required.
 
 - Uses Moonshine model (5x faster than Whisper)
 - Models downloaded on first use (~100MB)
@@ -94,7 +94,7 @@ Runs locally on CPU, no API key required.
 - You may see a `mutex lock failed` error — ignore it, the output is correct if `"ok": true`
 
 ```bash
-agent-media audio transcribe --in audio.mp3 --provider transformers
+agent-media audio transcribe --in audio.mp3 --provider local
 ```
 
 ### fal
