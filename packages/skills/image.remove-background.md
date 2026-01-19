@@ -16,7 +16,7 @@ agent-media image remove-background --in <path> [options]
 |--------|----------|-------------|
 | `--in` | Yes | Input file path or URL |
 | `--out` | No | Output directory (default: `.agent-media/`) |
-| `--provider` | No | Provider to use (default: auto-detect) |
+| `--provider` | No | Provider to use (local, fal, replicate) |
 
 ## Output
 
@@ -48,16 +48,16 @@ agent-media image remove-background --in portrait.jpg --provider replicate
 
 ## Providers
 
-### transformers.js
+### local
 
-Runs locally on CPU, no API key required.
+Runs locally on CPU using [Transformers.js](https://huggingface.co/docs/transformers.js), no API key required.
 
 - Uses `Xenova/modnet` model
 - Models downloaded on first use (~25MB)
 - You may see a `mutex lock failed` error — ignore it, the output is correct if `"ok": true`
 
 ```bash
-agent-media image remove-background --in portrait.jpg --provider transformers
+agent-media image remove-background --in portrait.jpg --provider local
 ```
 
 ### fal

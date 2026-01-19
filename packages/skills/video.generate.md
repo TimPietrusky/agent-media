@@ -55,7 +55,7 @@ agent-media video generate --prompt "ocean waves crashing on a beach" --duration
 
 Animate an existing image (image-to-video):
 ```bash
-agent-media video generate --in ./photo.jpg --prompt "the person waves hello and smiles"
+agent-media video generate --in woman-portrait.png --prompt "the person waves hello and smiles"
 ```
 
 Generate with audio:

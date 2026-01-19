@@ -19,7 +19,7 @@ agent-media audio transcribe --in <path> [options]
 | `--language` | No | Language code (auto-detected if not provided) |
 | `--speakers` | No | Number of speakers hint for diarization |
 | `--out` | No | Output directory (default: `.agent-media/`) |
-| `--provider` | No | Provider to use (fal, replicate) |
+| `--provider` | No | Provider to use (local, fal, replicate) |
 
 ## Output
 
@@ -76,7 +76,7 @@ To transcribe a video file, first extract the audio:
 
 ```bash
 # Step 1: Extract audio from video
-agent-media audio extract --in video.mp4 --format mp3
+agent-media audio extract --in woman-greeting.mp4 --format mp3
 
 # Step 2: Transcribe the extracted audio
 agent-media audio transcribe --in .agent-media/extracted_xxx.mp3
@@ -84,9 +84,9 @@ agent-media audio transcribe --in .agent-media/extracted_xxx.mp3
 
 ## Providers
 
-### transformers.js
+### local
 
-Runs locally on CPU, no API key required.
+Runs locally on CPU using [Transformers.js](https://huggingface.co/docs/transformers.js), no API key required.
 
 - Uses Moonshine model (5x faster than Whisper)
 - Models downloaded on first use (~100MB)
@@ -94,7 +94,7 @@ Runs locally on CPU, no API key required.
 - You may see a `mutex lock failed` error — ignore it, the output is correct if `"ok": true`
 
 ```bash
-agent-media audio transcribe --in audio.mp3 --provider transformers
+agent-media audio transcribe --in audio.mp3 --provider local
 ```
 
 ### fal
@@ -107,9 +107,9 @@ agent-media audio transcribe --in audio.mp3 --provider transformers
 ### replicate
 
 - Requires `REPLICATE_API_TOKEN`
-- Uses `whisperx` model with 70x realtime speed
-- Diarization requires `HUGGINGFACE_ACCESS_TOKEN` environment variable (for pyannote model access)
-- Provides word-level timestamps with alignment
+- Uses `whisper-diarization` model with Whisper Large V3 Turbo
+- Native diarization support (no additional tokens required)
+- Provides word-level timestamps with speaker identification
 
 ## Environment Variables
 
@@ -117,4 +117,3 @@ agent-media audio transcribe --in audio.mp3 --provider transformers
 |----------|----------|--------------|
 | `FAL_API_KEY` | fal | All transcription |
 | `REPLICATE_API_TOKEN` | replicate | All transcription |
-| `HUGGINGFACE_ACCESS_TOKEN` | replicate | Diarization only |

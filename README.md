@@ -6,88 +6,12 @@ Media processing CLI for AI agents.
 - **Video**: generate (text-to-video and image-to-video)
 - **Audio**: extract from video, transcribe (with speaker identification)
 
-## Quick Start
-
-### Local processing (no API key needed)
-
-Uses [Sharp](https://sharp.pixelplumbing.com/) for image operations and [transformers.js](https://huggingface.co/docs/transformers.js) for local AI (background removal, transcription).
-
-```bash
-bunx agent-media@latest image resize --in sunset-mountains.jpg --width 800
-bunx agent-media@latest image convert --in sunset-mountains.png --format webp
-bunx agent-media@latest image extend --in sunset-mountains.jpg --padding 50 --color "#FFFFFF"
-bunx agent-media@latest image remove-background --in portrait-headshot.png
-bunx agent-media@latest audio extract --in video.mp4
-bunx agent-media@latest audio transcribe --in audio.mp3
-```
-
-> **Note**: You may see a `mutex lock failed` error with local AI processing — ignore it, the output is correct if JSON shows `"ok": true`.
-
-**Provider auto-selection**: Without an API key, local processing is used. With an API key (`FAL_API_KEY`, `REPLICATE_API_TOKEN`, or `RUNPOD_API_KEY`), cloud providers are used. Override with `--provider <name>`.
-
-### AI-powered features
-
-Requires an API key from one of these providers:
-
-- [fal.ai](https://fal.ai/dashboard/keys) → `FAL_API_KEY`
-- [Replicate](https://replicate.com/account/api-tokens) → `REPLICATE_API_TOKEN`
-- [Runpod](https://www.runpod.io/console/user/settings) → `RUNPOD_API_KEY`
-
-### bunx
-
-```bash
-# Generate an image
-bunx agent-media@latest image generate --prompt "a robot painting a sunset"
-
-# Edit the generated image
-bunx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
-
-# Remove background
-bunx agent-media@latest image remove-background --in .agent-media/edited_*.png
-
-# Generate a video from text
-bunx agent-media@latest video generate --prompt "ocean waves crashing on rocks"
-
-# Generate a video from an image (image-to-video with audio)
-bunx agent-media@latest video generate --in portrait.png --prompt "person smiles and waves hello" --audio
-
-# Transcribe with speaker identification
-bunx agent-media@latest audio transcribe --in audio.mp3 --diarize
-```
-
-### npx
-
-```bash
-# Generate an image
-npx agent-media@latest image generate --prompt "a robot painting a sunset"
-
-# Edit the generated image
-npx agent-media@latest image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
-
-# Remove background
-npx agent-media@latest image remove-background --in .agent-media/edited_*.png
-
-# Generate a video from text
-npx agent-media@latest video generate --prompt "ocean waves crashing on rocks"
-
-# Generate a video from an image (image-to-video with audio)
-npx agent-media@latest video generate --in portrait.png --prompt "person smiles and waves hello" --audio
-
-# Transcribe with speaker identification
-npx agent-media@latest audio transcribe --in audio.mp3 --diarize
-```
-
 ## Installation
 
+### Global
+
 ```bash
-# Use directly with bunx (no install)
-bunx agent-media@latest --help
-
-# Or with npx
-npx agent-media@latest --help
-
-# Or install globally
-npm install -g agent-media
+npm install -g agent-media@latest
 ```
 
 ### From Source
@@ -98,33 +22,62 @@ cd agent-media
 pnpm install && pnpm build && pnpm link --global
 ```
 
+### Via bunx / npx
+
+Run directly without installing:
+
+```bash
+bunx agent-media@latest --help
+npx agent-media@latest --help
+```
+
+## Quick Start
+
+```bash
+# Generate an image
+agent-media image generate --prompt "a robot painting a sunset"
+
+# Edit the generated image
+agent-media image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
+
+# Remove background
+agent-media image remove-background --in .agent-media/edited_*.png
+
+# Convert to different format
+agent-media image convert --in .agent-media/nobg_*.png --format webp
+
+# Generate a video from an image (with audio)
+agent-media video generate --in woman-portrait.png --prompt "The woman speaks: 'Hello! Welcome to Agent Media.'" --audio --duration 10
+
+# Extract audio from video
+agent-media audio extract --in .agent-media/generated_*.mp4
+
+# Transcribe the audio
+agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
+```
+
 ## Requirements
 
 - Node.js >= 18.0.0
-- API key for AI features (image generate/edit, video generate, remove-background, transcribe)
+- API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), or [Runpod](https://www.runpod.io/console/user/settings) for AI features
+
+**Local processing** (no API key): resize, convert, extend, audio extract, remove-background, transcribe
+
+**Cloud processing** (API key required): image generate, image edit, video generate
+
+> **Note**: You may see a `mutex lock failed` error when using local remove-background or transcribe — ignore it, the output is correct if JSON shows `"ok": true`.
 
 ---
 
 ## image
 
 ```bash
-# Resize image
-agent-media@latest image resize --in <path> [options]
-
-# Convert format
-agent-media@latest image convert --in <path> --format <f>
-
-# Extend canvas with padding
-agent-media@latest image extend --in <path> --padding <px> --color <hex>
-
-# Generate image from text
-agent-media@latest image generate --prompt <text>
-
-# Edit image with text prompt
-agent-media@latest image edit --in <path> --prompt <text>
-
-# Remove background
-agent-media@latest image remove-background --in <path>
+agent-media image resize --in <path> [options]
+agent-media image convert --in <path> --format <f>
+agent-media image extend --in <path> --padding <px> --color <hex>
+agent-media image generate --prompt <text>
+agent-media image edit --in <path> --prompt <text>
+agent-media image remove-background --in <path>
 ```
 
 ### resize
@@ -132,9 +85,9 @@ agent-media@latest image remove-background --in <path>
 *local*
 
 ```bash
-agent-media@latest image resize --in sunset-mountains.jpg --width 800
-agent-media@latest image resize --in sunset-mountains.jpg --height 600
-agent-media@latest image resize --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.jpg --width 800
+agent-media image resize --in sunset-mountains.jpg --width 800
+agent-media image resize --in sunset-mountains.jpg --height 600
+agent-media image resize --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.jpg --width 800
 ```
 
 | Option | Description |
@@ -149,9 +102,9 @@ agent-media@latest image resize --in https://ytrzap04kkm0giml.public.blob.vercel
 *local*
 
 ```bash
-agent-media@latest image convert --in sunset-mountains.png --format webp
-agent-media@latest image convert --in sunset-mountains.jpg --format png
-agent-media@latest image convert --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.png --format jpg --quality 90
+agent-media image convert --in sunset-mountains.png --format webp
+agent-media image convert --in sunset-mountains.jpg --format png
+agent-media image convert --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.png --format jpg --quality 90
 ```
 
 | Option | Description |
@@ -168,8 +121,8 @@ agent-media@latest image convert --in https://ytrzap04kkm0giml.public.blob.verce
 Extend image canvas by adding padding on all sides with a solid background color.
 
 ```bash
-agent-media@latest image extend --in sunset-mountains.jpg --padding 50 --color "#E4ECF8"
-agent-media@latest image extend --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.png --padding 100 --color "#FFFFFF"
+agent-media image extend --in sunset-mountains.jpg --padding 50 --color "#E4ECF8"
+agent-media image extend --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.png --padding 100 --color "#FFFFFF"
 ```
 
 | Option | Description |
@@ -185,8 +138,8 @@ agent-media@latest image extend --in https://ytrzap04kkm0giml.public.blob.vercel
 *API key required*
 
 ```bash
-agent-media@latest image generate --prompt "a cat wearing a hat"
-agent-media@latest image generate --prompt "sunset over mountains" --width 1024 --height 768
+agent-media image generate --prompt "a cat wearing a hat"
+agent-media image generate --prompt "sunset over mountains" --width 1024 --height 768
 ```
 
 | Option | Description |
@@ -205,8 +158,8 @@ agent-media@latest image generate --prompt "sunset over mountains" --width 1024 
 Edit an image using a text prompt (image-to-image).
 
 ```bash
-agent-media@latest image edit --in sunset-mountains.jpg --prompt "make the sky more vibrant"
-agent-media@latest image edit --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/portrait-headshot.png --prompt "add sunglasses"
+agent-media image edit --in sunset-mountains.jpg --prompt "make the sky more vibrant"
+agent-media image edit --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/man-portrait.png --prompt "add sunglasses"
 ```
 
 | Option | Description |
@@ -222,8 +175,8 @@ agent-media@latest image edit --in https://ytrzap04kkm0giml.public.blob.vercel-s
 *API key required*
 
 ```bash
-agent-media@latest image remove-background --in portrait-headshot.png
-agent-media@latest image remove-background --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/portrait-headshot.png
+agent-media image remove-background --in man-portrait.png
+agent-media image remove-background --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/man-portrait.png
 ```
 
 | Option | Description |
@@ -238,10 +191,10 @@ agent-media@latest image remove-background --in https://ytrzap04kkm0giml.public.
 
 ```bash
 # Generate video from text
-agent-media@latest video generate --prompt <text>
+agent-media video generate --prompt <text>
 
 # Generate video from image (animate an image)
-agent-media@latest video generate --in <image> --prompt <text>
+agent-media video generate --in <image> --prompt <text>
 ```
 
 ### generate
@@ -252,16 +205,16 @@ Generate video from a text prompt. Optionally provide an input image to animate 
 
 ```bash
 # Text-to-video
-agent-media@latest video generate --prompt "a cat walking through a garden"
+agent-media video generate --prompt "a cat walking through a garden"
 
 # Image-to-video (animate an image)
-agent-media@latest video generate --in portrait.png --prompt "person smiles and waves hello"
+agent-media video generate --in woman-portrait.png --prompt "person smiles and waves hello"
 
 # With audio generation
-agent-media@latest video generate --prompt "fireworks in the night sky" --audio --duration 10
+agent-media video generate --prompt "fireworks in the night sky" --audio --duration 10
 
 # Higher resolution
-agent-media@latest video generate --prompt "ocean waves" --resolution 1080p
+agent-media video generate --prompt "ocean waves" --resolution 1080p
 ```
 
 | Option | Description |
@@ -283,10 +236,10 @@ agent-media@latest video generate --prompt "ocean waves" --resolution 1080p
 
 ```bash
 # Extract audio from video
-agent-media@latest audio extract --in <video>
+agent-media audio extract --in <video>
 
 # Transcribe audio to text
-agent-media@latest audio transcribe --in <audio>
+agent-media audio transcribe --in <audio>
 ```
 
 ### extract
@@ -296,8 +249,9 @@ agent-media@latest audio transcribe --in <audio>
 Extract audio track from a video file.
 
 ```bash
-agent-media@latest audio extract --in video.mp4
-agent-media@latest audio extract --in video.mp4 --format wav
+agent-media audio extract --in woman-greeting.mp4
+agent-media audio extract --in woman-greeting.mp4 --format wav
+agent-media audio extract --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/woman-greeting.mp4
 ```
 
 | Option | Description |
@@ -313,8 +267,9 @@ agent-media@latest audio extract --in video.mp4 --format wav
 Transcribe audio to text with timestamps. Supports speaker identification.
 
 ```bash
-agent-media@latest audio transcribe --in audio.mp3
-agent-media@latest audio transcribe --in audio.mp3 --diarize --speakers 2
+agent-media audio transcribe --in woman-greeting.mp3
+agent-media audio transcribe --in woman-greeting.mp3 --diarize --speakers 2
+agent-media audio transcribe --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/woman-greeting.mp3
 ```
 
 | Option | Description |
@@ -365,11 +320,13 @@ Exit code is `0` on success, `1` on error.
 
 | Provider | resize | convert | extend | image generate | image edit | remove-background | video generate | transcribe |
 |----------|--------|---------|--------|----------------|------------|-------------------|----------------|------------|
-| **local** | ✓ | ✓ | ✓ | - | - | - | - | - |
-| **transformers** | - | - | - | - | - | `Xenova/modnet` | - | `moonshine-base` |
+| **local** | ✓* | ✓* | ✓* | - | - | `Xenova/modnet`** | - | `moonshine-base`** |
 | **fal** | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/ltx-2` | `fal-ai/wizper` |
-| **replicate** | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | WhisperX |
+| **replicate** | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | `whisper-diarization` |
 | **runpod** | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | - |
+
+\* Powered by [Sharp](https://sharp.pixelplumbing.com/) for fast image processing
+\** Powered by [Transformers.js](https://huggingface.co/docs/transformers.js) for local ML inference (models downloaded on first use)
 
 Use `--model <name>` to override the default model for any command.
 
@@ -387,12 +344,11 @@ Use `--model <name>` to override the default model for any command.
 | `FAL_API_KEY` | fal.ai API key | [fal.ai](https://fal.ai/dashboard/keys) |
 | `REPLICATE_API_TOKEN` | Replicate API token | [replicate.com](https://replicate.com/account/api-tokens) |
 | `RUNPOD_API_KEY` | Runpod API key | [runpod.io](https://www.runpod.io/console/user/settings) |
-| `HUGGINGFACE_ACCESS_TOKEN` | For transcription with speaker ID (replicate only) | [huggingface.co](https://huggingface.co/settings/tokens) |
 | `AGENT_MEDIA_DIR` | Output directory (default: `.agent-media/`) | - |
 
 ## Roadmap
 
-- [x] Local CPU background removal via transformers.js/ONNX (zero API keys)
-- [x] Local CPU transcription via transformers.js/ONNX (zero API keys)
+- [x] Local background removal (zero API keys)
+- [x] Local transcription (zero API keys)
 - [x] Video generation (text-to-video and image-to-video)
 - [ ] Batch processing support
