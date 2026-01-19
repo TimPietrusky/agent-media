@@ -1,5 +1,22 @@
 # @agent-media/video
 
+## 0.2.0
+
+### Minor Changes
+
+- 6097a41: Add video generation command supporting text-to-video and image-to-video
+
+  - New `video generate` CLI command with options for duration, resolution, fps, and audio
+  - Support for fal.ai (LTX-2) and Replicate (lightricks/ltx-video) providers
+  - Image-to-video: animate a static image with a text prompt
+  - Optional audio generation with `--audio` flag
+
+### Patch Changes
+
+- Updated dependencies [6097a41]
+  - @agent-media/core@0.5.0
+  - @agent-media/providers@0.5.0
+
 ## 0.1.5
 
 ### Patch Changes
