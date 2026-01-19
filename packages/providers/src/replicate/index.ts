@@ -301,78 +301,43 @@ async function executeRemoveBackground(
 }
 
 /**
- * Execute transcribe action using Replicate whisperx model
- * Supports diarization (requires HUGGINGFACE_ACCESS_TOKEN for pyannote model)
+ * Execute transcribe action using Replicate whisper-diarization model
+ * Uses thomasmol/whisper-diarization with Whisper Large V3 Turbo
+ * Supports diarization without requiring additional tokens
  */
 async function executeTranscribe(
   options: TranscribeOptions,
   context: ActionContext,
   apiToken: string
 ): Promise<MediaResult> {
-  const { input, diarize = false, language, numSpeakers } = options;
+  const { input, language, numSpeakers } = options;
 
   if (!input?.source) {
     return createError(ErrorCodes.INVALID_INPUT, 'Input source is required for transcription');
   }
 
+  // Build request body for whisper-diarization
+  const requestBody: Record<string, unknown> = {};
+
   // Prepare the audio input
-  let audioUrl: string;
   if (input.isUrl) {
-    audioUrl = input.source;
+    requestBody['file_url'] = input.source;
   } else {
-    // Convert local file to data URI
+    // Convert local file to base64
     const buffer = await readFile(input.source);
     const base64 = buffer.toString('base64');
-    // Detect mime type from extension
-    const ext = input.source.toLowerCase().split('.').pop();
-    let mimeType: string;
-    switch (ext) {
-      case 'mp3':
-        mimeType = 'audio/mpeg';
-        break;
-      case 'wav':
-        mimeType = 'audio/wav';
-        break;
-      case 'mp4':
-      case 'm4a':
-        mimeType = 'audio/mp4';
-        break;
-      case 'webm':
-        mimeType = 'audio/webm';
-        break;
-      case 'ogg':
-        mimeType = 'audio/ogg';
-        break;
-      default:
-        mimeType = 'audio/mpeg';
-    }
-    audioUrl = `data:${mimeType};base64,${base64}`;
+    requestBody['file_string'] = base64;
   }
 
-  // Build request body for whisperx
-  const requestBody: Record<string, unknown> = {
-    audio_file: audioUrl,
-    align_output: true,
-  };
-
-  if (diarize) {
-    requestBody['diarization'] = true;
-    // Note: Diarization requires HUGGINGFACE_ACCESS_TOKEN env var
-    const hfToken = process.env['HUGGINGFACE_ACCESS_TOKEN'];
-    if (hfToken) {
-      requestBody['huggingface_access_token'] = hfToken;
-    }
-    if (numSpeakers) {
-      requestBody['min_speakers'] = numSpeakers;
-      requestBody['max_speakers'] = numSpeakers;
-    }
+  if (numSpeakers) {
+    requestBody['num_speakers'] = numSpeakers;
   }
 
   if (language) {
     requestBody['language'] = language;
   }
 
-  // Call whisperx via Replicate API
+  // Call whisper-diarization via Replicate API
   const response = await fetch('https://api.replicate.com/v1/predictions', {
     method: 'POST',
     headers: {
@@ -380,7 +345,7 @@ async function executeTranscribe(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      version: '84d2ad2d6194fe98a17d2b60bef1c7f910c46b2f6fd38996ca457afd9c8abfcb',
+      version: '1495a9cddc83b2203b0d8d3516e38b80fd1572ebc4bc5700ac1da56a9b3ed886',
       input: requestBody,
     }),
   });
@@ -400,7 +365,8 @@ async function executeTranscribe(
   let result: {
     status: string;
     output?: {
-      detected_language?: string;
+      language?: string;
+      num_speakers?: number;
       segments?: Array<{
         start: number;
         end: number;
@@ -452,7 +418,7 @@ async function executeTranscribe(
   const segments = result!.output.segments || [];
   const transcription: TranscriptionData = {
     text: segments.map(s => s.text).join(' '),
-    language: result!.output.detected_language || language || 'unknown',
+    language: result!.output.language || language || 'unknown',
     segments: segments.map(segment => ({
       start: segment.start,
       end: segment.end,

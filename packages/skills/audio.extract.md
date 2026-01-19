@@ -38,22 +38,22 @@ Returns a JSON object with the extracted audio file:
 
 Extract audio as MP3 (default):
 ```bash
-agent-media audio extract --in video.mp4
+agent-media audio extract --in woman-greeting.mp4
 ```
 
 Extract audio as WAV:
 ```bash
-agent-media audio extract --in video.mp4 --format wav
+agent-media audio extract --in woman-greeting.mp4 --format wav
 ```
 
 Extract as MP3 with format flag:
 ```bash
-agent-media audio extract --in video.mp4 --format mp3
+agent-media audio extract --in woman-greeting.mp4 --format mp3
 ```
 
 Custom output directory:
 ```bash
-agent-media audio extract --in video.mp4 --out ./audio-files
+agent-media audio extract --in woman-greeting.mp4 --out ./audio-files
 ```
 
 ## Use Case: Video Transcription Workflow

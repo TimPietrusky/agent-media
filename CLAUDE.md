@@ -33,7 +33,7 @@ packages/
 ├── image/        # Image action implementations (resize, convert, generate, remove-background, extend, edit)
 ├── audio/        # Audio action implementations (extract, transcribe)
 ├── video/        # Reserved for future video-specific actions
-├── providers/    # Provider implementations (local/Sharp, transformers, fal.ai, replicate, runpod)
+├── providers/    # Provider implementations (local, fal.ai, replicate, runpod)
 └── skills/       # Markdown skill definitions for agent discovery
 ```
 
@@ -47,23 +47,21 @@ packages/
 
 **Audio Package**: The `packages/audio/` package handles audio operations:
 - `extract` - Extracts audio from video files using bundled ffmpeg (via `ffmpeg-static`). No API keys needed.
-- `transcribe` - Transcribes audio to text using cloud providers (fal, replicate).
+- `transcribe` - Transcribes audio to text using local or cloud providers (local, fal, replicate).
 
 **Result Contract**: All output is JSON via `MediaResult` (success or error):
 - `packages/core/src/result/index.ts` - `createSuccess()`, `createError()`, `printResult()`
 - Error codes defined in `packages/core/src/types/index.ts`
 
-**Local Provider**: Uses Sharp for zero-config image operations (resize, convert) without external APIs.
+**Local Provider**: Zero-config operations without external APIs. Uses:
+- [Sharp](https://sharp.pixelplumbing.com/) for image processing (resize, convert, extend)
+- [Transformers.js](https://huggingface.co/docs/transformers.js) for ML inference (remove-background with Xenova/modnet, transcribe with Moonshine)
 
 **Fal Provider**: Uses @ai-sdk/fal for image generation (fal-ai/flux-2), editing (fal-ai/flux-2/edit), and background removal (birefnet/v2). Requires `FAL_API_KEY`.
 
 **Replicate Provider**: Uses @ai-sdk/replicate for image generation (black-forest-labs/flux-2-dev), editing (black-forest-labs/flux-kontext-dev), and background removal (birefnet). Requires `REPLICATE_API_TOKEN`.
 
 **Runpod Provider**: Uses @runpod/ai-sdk-provider for image generation (alibaba/wan-2.6) and image editing (google/nano-banana-pro-edit). Requires `RUNPOD_API_KEY`.
-
-**Transformers.js Provider**: Uses @huggingface/transformers for local ML inference. No API keys required. Models are downloaded on first use and cached locally.
-- `remove-background` - Xenova/modnet (default)
-- `transcribe` - Moonshine (default, 5x faster than Whisper), Whisper, Distil-Whisper
 
 **Input Support**: All providers support both local file paths and URLs as input. Local files are handled via:
 - Local provider: `createReadStream()` → Buffer → Sharp
@@ -98,7 +96,6 @@ packages/
 - `FAL_API_KEY` - fal provider (generate, remove-background, transcribe)
 - `REPLICATE_API_TOKEN` - replicate provider (generate, remove-background, transcribe)
 - `RUNPOD_API_KEY` - runpod provider (generate, edit)
-- `HUGGINGFACE_ACCESS_TOKEN` - replicate provider (transcribe with diarization only)
 - `AGENT_MEDIA_DIR` - Custom output directory (default: `.agent-media/`)
 
 ## Commit Workflow
@@ -246,4 +243,4 @@ This toolkit is designed for AI agents to understand and use. Follow these namin
 
 ## Known Issues (Safe to Ignore)
 
-**`mutex lock failed` error with `--provider transformers`**: Ignore it, the output is correct if JSON shows `"ok": true`.
+**`mutex lock failed` error with local remove-background or transcribe**: Ignore it, the output is correct if JSON shows `"ok": true`.
