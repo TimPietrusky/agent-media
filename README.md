@@ -17,7 +17,7 @@ npm install -g agent-media@latest
 ### From Source
 
 ```bash
-git clone https://github.com/TimPietrusky/agent-media
+git clone https://github.com/agntswrm/agent-media
 cd agent-media
 pnpm install && pnpm build && pnpm link --global
 ```
@@ -30,6 +30,24 @@ Run directly without installing:
 bunx agent-media@latest --help
 npx agent-media@latest --help
 ```
+
+### Skills for AI Agents
+
+Install agent-media skills to your coding agent (Claude Code, Cursor, Codex, etc.):
+
+```bash
+npx skills add agntswrm/agent-media
+```
+
+This adds media processing skills that your AI agent can use automatically. Available skills:
+- `agent-media` - Overview of all capabilities
+- `image-generate` - Generate images from text
+- `image-resize` - Resize images
+- `image-convert` - Convert image formats
+- `image-remove-background` - Remove backgrounds
+- `audio-extract` - Extract audio from video
+- `audio-transcribe` - Transcribe audio to text
+- `video-generate` - Generate videos from text or images
 
 ## Quick Start
 
