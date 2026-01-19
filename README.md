@@ -8,67 +8,41 @@ Media processing CLI for AI agents.
 
 ## Quick Start
 
-Run directly with `bunx` or `npx` (no install needed):
-
 ```bash
-bunx agent-media image resize --in sunset-mountains.jpg --width 800
-# or
-npx agent-media image resize --in sunset-mountains.jpg --width 800
-```
+# Run with bunx (recommended) or npx
+bunx agent-media image generate --prompt "a robot painting a sunset"
 
-Or install globally: `npm install -g agent-media`
-
-### Local processing (no API key needed)
-
-Uses [Sharp](https://sharp.pixelplumbing.com/) for image operations and [transformers.js](https://huggingface.co/docs/transformers.js) for local AI (background removal, transcription).
-
-```bash
-agent-media image resize --in sunset-mountains.jpg --width 800
-agent-media image convert --in sunset-mountains.png --format webp
-agent-media image extend --in sunset-mountains.jpg --padding 50 --color "#FFFFFF"
-agent-media image remove-background --in man-portrait.png
-agent-media audio extract --in woman-greeting.mp4
-agent-media audio transcribe --in woman-greeting.mp3
-```
-
-> **Note**: You may see a `mutex lock failed` error with local AI processing — ignore it, the output is correct if JSON shows `"ok": true`.
-
-### AI-powered features (API key required)
-
-Get an API key from one of these providers:
-
-- [fal.ai](https://fal.ai/dashboard/keys) → `FAL_API_KEY`
-- [Replicate](https://replicate.com/account/api-tokens) → `REPLICATE_API_TOKEN`
-- [Runpod](https://www.runpod.io/console/user/settings) → `RUNPOD_API_KEY`
-
-```bash
 # Generate an image
 agent-media image generate --prompt "a robot painting a sunset"
 
-# Edit an image
+# Edit the generated image
 agent-media image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
 
-# Generate a video from text
-agent-media video generate --prompt "ocean waves crashing on rocks"
+# Remove background
+agent-media image remove-background --in .agent-media/edited_*.png
 
-# Generate a video from an image (image-to-video with audio)
-agent-media video generate --in woman-portrait.png --prompt "person smiles and waves hello" --audio
+# Convert to different format
+agent-media image convert --in .agent-media/nobg_*.png --format webp
 
-# Transcribe with speaker identification
-agent-media audio transcribe --in woman-greeting.mp3 --diarize
+# Generate a video from an image (with audio)
+agent-media video generate --in woman-portrait.png --prompt "The woman speaks: 'Hello! Welcome to Agent Media.'" --audio --duration 10
+
+# Extract audio from video
+agent-media audio extract --in .agent-media/generated_*.mp4
+
+# Transcribe the audio
+agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
 ```
-
-**Provider auto-selection**: Without an API key, local processing is used. With an API key, cloud providers are used. Override with `--provider <name>`.
 
 ## Installation
 
 ```bash
-# Install globally
-npm install -g agent-media
-
-# Or use directly without install
+# Run directly without install (recommended)
 bunx agent-media --help
 npx agent-media --help
+
+# Or install globally
+npm install -g agent-media
 ```
 
 ### From Source
@@ -82,7 +56,13 @@ pnpm install && pnpm build && pnpm link --global
 ## Requirements
 
 - Node.js >= 18.0.0
-- API key for AI features (image generate/edit, video generate, remove-background, transcribe)
+- API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), or [Runpod](https://www.runpod.io/console/user/settings) for AI features
+
+**Local processing** (no API key): resize, convert, extend, audio extract
+
+**Cloud processing** (API key required): image generate, image edit, remove-background, video generate, transcribe
+
+> **Note**: You may see a `mutex lock failed` error with `--provider transformers` — ignore it, the output is correct if JSON shows `"ok": true`.
 
 ---
 
