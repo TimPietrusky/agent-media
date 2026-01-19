@@ -1,5 +1,12 @@
 # @agent-media/audio
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [cac474a]
+  - @agent-media/providers@0.5.1
+
 ## 0.4.1
 
 ### Patch Changes
