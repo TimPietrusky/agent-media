@@ -9,9 +9,6 @@ Media processing CLI for AI agents.
 ## Quick Start
 
 ```bash
-# Run with bunx (recommended) or npx
-bunx agent-media image generate --prompt "a robot painting a sunset"
-
 # Generate an image
 agent-media image generate --prompt "a robot painting a sunset"
 
@@ -36,13 +33,22 @@ agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
 
 ## Installation
 
-```bash
-# Run directly without install (recommended)
-bunx agent-media --help
-npx agent-media --help
+### bunx
 
-# Or install globally
-npm install -g agent-media
+```bash
+bunx agent-media@latest --help
+```
+
+### npx
+
+```bash
+npx agent-media@latest --help
+```
+
+### Global install
+
+```bash
+npm install -g agent-media@latest
 ```
 
 ### From Source
