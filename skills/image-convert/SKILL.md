@@ -20,7 +20,7 @@ agent-media image convert --in <path> --format <format> [options]
 | `--in` | Yes | Input file path or URL |
 | `--format` | Yes | Output format: `png`, `jpg`, `webp` |
 | `--quality` | No | Quality for lossy formats (1-100, default: 80) |
-| `--out` | No | Output directory (default: `.agent-media/`) |
+| `--out` | No | Output path (filename or directory) |
 | `--provider` | No | Provider to use (default: auto-detect) |
 
 ## Output
@@ -33,7 +33,7 @@ Returns a JSON object with the converted image path:
   "media_type": "image",
   "action": "convert",
   "provider": "local",
-  "output_path": ".agent-media/converted_123_abc.webp",
+  "output_path": "converted_123_abc.webp",
   "mime": "image/webp",
   "bytes": 23456
 }

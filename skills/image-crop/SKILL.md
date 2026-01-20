@@ -23,7 +23,7 @@ agent-media image crop --in <path> --width <px> --height <px> [options]
 | `--focus-x` | No | Focal point X position 0-100 (default: 50 = center) |
 | `--focus-y` | No | Focal point Y position 0-100 (default: 50 = center) |
 | `--dpi` | No | DPI/density for output (default: 300) |
-| `--out` | No | Output directory (default: `.agent-media/`) |
+| `--out` | No | Output path (filename or directory) |
 | `--provider` | No | Provider to use (default: local) |
 
 ## Output
@@ -36,7 +36,7 @@ Returns a JSON object with the cropped image path:
   "media_type": "image",
   "action": "crop",
   "provider": "local",
-  "output_path": ".agent-media/cropped_123_abc.png",
+  "output_path": "cropped_123_abc.png",
   "mime": "image/png",
   "bytes": 45678
 }

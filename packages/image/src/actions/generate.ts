@@ -28,7 +28,7 @@ export interface GenerateInput {
  */
 export async function generate(options: GenerateInput): Promise<MediaResult> {
   const context: ActionContext = {
-    outputDir: options.out ?? process.cwd() + '/.agent-media',
+    outputDir: options.out ?? process.cwd(),
     provider: options.provider,
     outputName: options.name,
     // No inputSource for generate - uses generic prefix
