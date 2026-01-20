@@ -1,5 +1,20 @@
 # agent-media
 
+## 0.8.0
+
+### Minor Changes
+
+- 02643b6: Add AI Gateway provider for image generation and editing via Vercel's unified API. Supports BFL Flux (flux-2-pro) for generation and Google Gemini (gemini-3-pro-image) for editing. Set AI_GATEWAY_API_KEY environment variable to use.
+
+### Patch Changes
+
+- Updated dependencies [02643b6]
+  - @agent-media/core@0.7.0
+  - @agent-media/providers@0.7.0
+  - @agent-media/audio@0.4.5
+  - @agent-media/image@0.4.1
+  - @agent-media/video@0.2.4
+
 ## 0.7.0
 
 ### Minor Changes
