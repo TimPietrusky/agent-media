@@ -134,7 +134,7 @@ const result = await transcribe({
 |----------|----------|------|-------------------|------------|----------------|
 | **fal** | AI SDK | AI SDK | AI SDK | AI SDK | fal client SDK |
 | **replicate** | AI SDK | AI SDK | AI SDK | replicate SDK* | replicate SDK |
-| **runpod** | AI SDK | AI SDK | - | - | - |
+| **runpod** | AI SDK | AI SDK | - | - | raw API (wan-2.6) |
 | **ai-gateway** | AI SDK | AI SDK** | - | - | - |
 
 *AI SDK `@ai-sdk/replicate` doesn't support `.transcription()` method, so we use `replicate` npm package.
@@ -169,7 +169,7 @@ const result = await transcribe({
 - `REPLICATE_API_TOKEN` - replicate provider (generate, remove-background, transcribe)
 - `RUNPOD_API_KEY` - runpod provider (generate, edit)
 - `AI_GATEWAY_API_KEY` - ai-gateway provider (generate, edit)
-- `AGENT_MEDIA_DIR` - Custom output directory (default: `.agent-media/`)
+- `AGENT_MEDIA_DIR` - Custom output directory (default: current directory)
 
 ## Commit Workflow
 
@@ -271,14 +271,14 @@ This project uses **changesets** for versioning and automated npm publishing via
 
 ## README Sync
 
-**IMPORTANT:** The root `README.md` must be copied to `packages/cli/README.md` whenever it changes.
+**IMPORTANT:** The root `README.md` must be copied to `packages/agent-media/README.md` whenever it changes.
 
-npm displays the README from the published package directory, not the repository root. Since the CLI package (`agent-media`) is published from `packages/cli/`, that's where npm looks for the README.
+npm displays the README from the published package directory, not the repository root. Since the CLI package (`agent-media`) is published from `packages/agent-media/`, that's where npm looks for the README.
 
 **When updating README.md:**
 ```bash
 # After editing the root README.md, always sync to CLI package:
-cp README.md packages/cli/README.md
+cp README.md packages/agent-media/README.md
 ```
 
 Include this copy in the same commit/PR as your README changes.

@@ -19,7 +19,7 @@ agent-media audio extract --in <path> [options]
 |--------|----------|-------------|
 | `--in` | Yes | Input video file path or URL (supports mp4, webm, mkv, avi, mov) |
 | `--format` | No | Output audio format: `mp3` (default) or `wav` |
-| `--out` | No | Output directory (default: `.agent-media/`) |
+| `--out` | No | Output path, filename or directory (default: ./) |
 
 ## Output
 
@@ -31,7 +31,7 @@ Returns a JSON object with the extracted audio file:
   "media_type": "audio",
   "action": "extract",
   "provider": "local",
-  "output_path": ".agent-media/extracted_123_abc.mp3",
+  "output_path": "extracted_123_abc.mp3",
   "mime": "audio/mpeg",
   "bytes": 24779
 }
@@ -61,10 +61,10 @@ Since transcription services work best with audio files (smaller uploads, faster
 ```bash
 # Step 1: Extract audio from video (local, instant)
 agent-media audio extract --in interview.mp4 --format mp3
-# Output: .agent-media/extracted_xxx.mp3
+# Output: extracted_xxx.mp3
 
 # Step 2: Transcribe the audio (cloud API)
-agent-media audio transcribe --in .agent-media/extracted_xxx.mp3 --provider fal
+agent-media audio transcribe --in extracted_xxx.mp3 --provider fal
 ```
 
 ## Provider

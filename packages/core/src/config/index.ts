@@ -1,11 +1,11 @@
 import { mkdir } from 'node:fs/promises';
-import { join, resolve, basename } from 'node:path';
+import { join, resolve, basename, dirname, extname } from 'node:path';
 import { randomUUID } from 'node:crypto';
 
 /**
- * Default output directory name
+ * Default output directory name (current working directory)
  */
-export const DEFAULT_OUTPUT_DIR = '.agent-media';
+export const DEFAULT_OUTPUT_DIR = '.';
 
 /**
  * Configuration for agent-media
@@ -25,8 +25,7 @@ export interface AgentMediaConfig {
  * Get configuration from environment variables and defaults
  */
 export function getConfig(): AgentMediaConfig {
-  const outputDir =
-    process.env['AGENT_MEDIA_DIR'] ?? join(process.cwd(), DEFAULT_OUTPUT_DIR);
+  const outputDir = process.env['AGENT_MEDIA_DIR'] ?? process.cwd();
 
   return {
     outputDir: resolve(outputDir),
@@ -124,20 +123,49 @@ export interface MergedConfig {
 }
 
 /**
+ * Check if a path looks like a filename (has an extension)
+ */
+function isFilename(path: string): boolean {
+  const ext = extname(path);
+  // Common media extensions
+  const mediaExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.mp4', '.webm', '.mp3', '.wav', '.json'];
+  return mediaExtensions.includes(ext.toLowerCase());
+}
+
+/**
  * Merge CLI options with config defaults
  * CLI options take precedence over environment config
+ * --out can be either a directory or a filename (detected by extension)
  */
 export function mergeConfig(
   config: AgentMediaConfig,
   cliOptions: {
     out?: string;
     provider?: string;
-    name?: string;
   }
 ): MergedConfig {
+  if (cliOptions.out) {
+    if (isFilename(cliOptions.out)) {
+      // --out is a filename: extract directory and name
+      const resolvedPath = resolve(cliOptions.out);
+      return {
+        outputDir: dirname(resolvedPath),
+        provider: cliOptions.provider,
+        outputName: basename(resolvedPath),
+      };
+    } else {
+      // --out is a directory
+      return {
+        outputDir: resolve(cliOptions.out),
+        provider: cliOptions.provider,
+        outputName: undefined,
+      };
+    }
+  }
+
   return {
-    outputDir: cliOptions.out ? resolve(cliOptions.out) : config.outputDir,
+    outputDir: config.outputDir,
     provider: cliOptions.provider,
-    outputName: cliOptions.name,
+    outputName: undefined,
   };
 }

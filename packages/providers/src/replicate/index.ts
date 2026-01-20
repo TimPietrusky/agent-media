@@ -90,7 +90,7 @@ async function executeGenerate(
   context: ActionContext,
   apiToken: string
 ): Promise<MediaResult> {
-  const { prompt, width = 1024, height = 1024, model, seed } = options;
+  const { prompt, width = 1280, height = 720, model, seed } = options;
 
   if (!prompt) {
     return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image generation');

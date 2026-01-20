@@ -23,8 +23,7 @@ agent-media video generate --prompt <text> [options]
 | `--resolution` | No | Video resolution (720p, 1080p, 1440p, 2160p; default: 720p) |
 | `--fps` | No | Frame rate (25 or 50; default: 25) |
 | `--audio` | No | Generate audio track |
-| `--out` | No | Output directory (default: `.agent-media/`) |
-| `--name` | No | Output filename (extension auto-added if missing) |
+| `--out` | No | Output path, filename or directory (default: ./) |
 | `--provider` | No | Provider to use (default: auto-detect) |
 | `--model` | No | Model to use (overrides provider default) |
 
@@ -38,7 +37,7 @@ Returns a JSON object with the generated video path:
   "media_type": "video",
   "action": "video-generate",
   "provider": "fal",
-  "output_path": ".agent-media/generated_abc123.mp4",
+  "output_path": "generated_abc123.mp4",
   "mime": "video/mp4",
   "bytes": 12345678
 }

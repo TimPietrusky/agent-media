@@ -18,7 +18,7 @@ agent-media image remove-background --in <path> [options]
 | Option | Required | Description |
 |--------|----------|-------------|
 | `--in` | Yes | Input file path or URL |
-| `--out` | No | Output directory (default: `.agent-media/`) |
+| `--out` | No | Output path, filename or directory (default: ./) |
 | `--provider` | No | Provider to use (local, fal, replicate) |
 
 ## Output
@@ -31,7 +31,7 @@ Returns a JSON object with the processed image path:
   "media_type": "image",
   "action": "remove-background",
   "provider": "fal",
-  "output_path": ".agent-media/nobg_123_abc.png",
+  "output_path": "nobg_123_abc.png",
   "mime": "image/png",
   "bytes": 34567
 }

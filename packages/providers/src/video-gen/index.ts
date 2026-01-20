@@ -9,6 +9,8 @@ import Replicate from 'replicate';
 import { readFile } from 'node:fs/promises';
 import type { VideoResolution, VideoFps } from '@agent-media/core';
 
+export { generateVideoRunpod } from './runpod.js';
+
 /**
  * Configuration for video generation
  */

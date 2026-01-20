@@ -71,7 +71,7 @@ function runFfmpeg(args: string[]): Promise<{ stdout: string; stderr: string }> 
  */
 export async function extract(options: ExtractInput): Promise<MediaResult> {
   const { input: inputPath, format = 'mp3', out, name } = options;
-  const outputDir = out ?? process.cwd() + '/.agent-media';
+  const outputDir = out ?? process.cwd();
 
   try {
     await ensureOutputDir(outputDir);

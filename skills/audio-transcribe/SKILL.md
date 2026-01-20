@@ -21,7 +21,7 @@ agent-media audio transcribe --in <path> [options]
 | `--diarize` | No | Enable speaker identification |
 | `--language` | No | Language code (auto-detected if not provided) |
 | `--speakers` | No | Number of speakers hint for diarization |
-| `--out` | No | Output directory (default: `.agent-media/`) |
+| `--out` | No | Output path, filename or directory (default: ./) |
 | `--provider` | No | Provider to use (local, fal, replicate) |
 
 ## Output
@@ -34,7 +34,7 @@ Returns a JSON object with transcription data:
   "media_type": "audio",
   "action": "transcribe",
   "provider": "fal",
-  "output_path": ".agent-media/transcription_123_abc.json",
+  "output_path": "transcription_123_abc.json",
   "transcription": {
     "text": "Full transcription text...",
     "language": "en",
@@ -77,7 +77,7 @@ To transcribe a video file, first extract the audio:
 agent-media audio extract --in video.mp4 --format mp3
 
 # Step 2: Transcribe the extracted audio
-agent-media audio transcribe --in .agent-media/extracted_xxx.mp3
+agent-media audio transcribe --in extracted_xxx.mp3
 ```
 
 ## Providers

@@ -53,26 +53,23 @@ This adds media processing skills that your AI agent can use automatically. Avai
 ## Quick Start
 
 ```bash
-# Generate an image
-agent-media image generate --prompt "a robot painting a sunset"
+# generate an image
+agent-media image generate --prompt "a robot" --out rob.png
 
-# Edit the generated image
-agent-media image edit --in .agent-media/generated_*.png --prompt "add a cat watching"
+# remove background
+agent-media image remove-background --in rob.png --out rob_nobg.png
 
-# Remove background
-agent-media image remove-background --in .agent-media/edited_*.png
+# edit the image
+agent-media image edit --in rob_nobg.png --prompt "the robot is sitting on a bench next to a cat, in the background you can see the Eiffel Tower in Paris" --out rob_cat_paris.png
 
-# Convert to different format
-agent-media image convert --in .agent-media/nobg_*.png --format webp
+# generate a video with audio (cat meows, robot speaks!)
+agent-media video generate --in rob_cat_paris.png --prompt "the cat meows and the robot says: \"Yes, me too.\"" --audio --out rob_cat_video.mp4
 
-# Generate a video from an image (with audio)
-agent-media video generate --in woman-portrait.png --prompt "The woman speaks: 'Hello! Welcome to Agent Media.'" --audio --duration 10
+# extract audio from video
+agent-media audio extract --in rob_cat_video.mp4 --out rob_cat_audio.mp3
 
-# Extract audio from video
-agent-media audio extract --in .agent-media/generated_*.mp4
-
-# Transcribe the audio
-agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
+# transcribe the audio
+agent-media audio transcribe --in rob_cat_audio.mp3
 ```
 
 ## Requirements
@@ -115,7 +112,7 @@ agent-media image resize --in https://ytrzap04kkm0giml.public.blob.vercel-storag
 | `--in <path>` | Input file path or URL (required) |
 | `--width <px>` | Target width in pixels |
 | `--height <px>` | Target height in pixels |
-| `--out <dir>` | Output directory |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 
 ### convert
 
@@ -132,7 +129,7 @@ agent-media image convert --in https://ytrzap04kkm0giml.public.blob.vercel-stora
 | `--in <path>` | Input file path or URL (required) |
 | `--format <f>` | Output format: png, jpg, webp (required) |
 | `--quality <n>` | Quality 1-100 for lossy formats (default: 80) |
-| `--out <dir>` | Output directory |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 
 ### extend
 
@@ -151,7 +148,7 @@ agent-media image extend --in https://ytrzap04kkm0giml.public.blob.vercel-storag
 | `--padding <px>` | Padding size in pixels to add on all sides (required) |
 | `--color <hex>` | Background color for extended area (required). Also flattens transparency. |
 | `--dpi <n>` | DPI/density for output image (default: 300) |
-| `--out <dir>` | Output directory |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 
 ### crop
 
@@ -173,7 +170,7 @@ agent-media image crop --in https://ytrzap04kkm0giml.public.blob.vercel-storage.
 | `--focus-x <n>` | Focal point X position 0-100 (default: 50 = center) |
 | `--focus-y <n>` | Focal point Y position 0-100 (default: 50 = center) |
 | `--dpi <n>` | DPI/density for output image (default: 300) |
-| `--out <dir>` | Output directory |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 
 ### generate
 
@@ -187,9 +184,9 @@ agent-media image generate --prompt "sunset over mountains" --width 1024 --heigh
 | Option | Description |
 |--------|-------------|
 | `--prompt <text>` | Text description (required) |
-| `--width <px>` | Width (default: 1024) |
-| `--height <px>` | Height (default: 1024) |
-| `--out <dir>` | Output directory |
+| `--width <px>` | Width (default: 1280) |
+| `--height <px>` | Height (default: 720) |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 | `--provider <name>` | Provider (fal, replicate, runpod, ai-gateway) |
 | `--model <name>` | Model override (e.g., `fal-ai/flux-2`, `bfl/flux-2-pro`) |
 
@@ -208,7 +205,7 @@ agent-media image edit --in https://ytrzap04kkm0giml.public.blob.vercel-storage.
 |--------|-------------|
 | `--in <path>` | Input file path or URL (required) |
 | `--prompt <text>` | Text description of the desired edit (required) |
-| `--out <dir>` | Output directory |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 | `--provider <name>` | Provider (fal, replicate, runpod, ai-gateway) |
 | `--model <name>` | Model override (e.g., `fal-ai/flux-2/edit`, `google/gemini-3-pro-image`) |
 
@@ -224,7 +221,7 @@ agent-media image remove-background --in https://ytrzap04kkm0giml.public.blob.ve
 | Option | Description |
 |--------|-------------|
 | `--in <path>` | Input file path or URL (required) |
-| `--out <dir>` | Output directory |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 | `--provider <name>` | Provider (local, fal, replicate) |
 
 ---
@@ -252,8 +249,11 @@ agent-media video generate --prompt "a cat walking through a garden"
 # Image-to-video (animate an image)
 agent-media video generate --in woman-portrait.png --prompt "person smiles and waves hello"
 
-# With audio generation
-agent-media video generate --prompt "fireworks in the night sky" --audio --duration 10
+# With audio/speech generation (runpod)
+agent-media video generate --in woman-portrait.png --prompt "The woman says: \"Hello, welcome to our channel!\"" --audio --provider runpod
+
+# With ambient audio (fal)
+agent-media video generate --prompt "fireworks in the night sky" --audio --duration 10 --provider fal
 
 # Higher resolution
 agent-media video generate --prompt "ocean waves" --resolution 1080p
@@ -263,13 +263,12 @@ agent-media video generate --prompt "ocean waves" --resolution 1080p
 |--------|-------------|
 | `--prompt <text>` | Text description of the video (required) |
 | `--in <path>` | Input image for image-to-video (optional) |
-| `--duration <s>` | Duration: 6, 8, 10, 12, 14, 16, 18, 20 (default: 6) |
-| `--resolution <r>` | Resolution: 720p, 1080p, 1440p, 2160p (default: 720p) |
+| `--duration <s>` | Duration in seconds (default: 5 for runpod, 6 for others) |
+| `--resolution <r>` | Resolution: 720p, 1080p (default: 720p) |
 | `--fps <n>` | Frame rate: 25, 50 (default: 25) |
-| `--audio` | Generate audio track |
-| `--out <dir>` | Output directory |
-| `--name <filename>` | Output filename (extension auto-added) |
-| `--provider <name>` | Provider (fal, replicate) |
+| `--audio` | Generate audio track (includes speech from quoted text with runpod) |
+| `--out <path>` | Output path, filename or directory (default: ./) |
+| `--provider <name>` | Provider (fal, replicate, runpod) |
 | `--model <name>` | Model override |
 
 ---
@@ -300,7 +299,7 @@ agent-media audio extract --in https://ytrzap04kkm0giml.public.blob.vercel-stora
 |--------|-------------|
 | `--in <path>` | Input video file path or URL (required) |
 | `--format <f>` | Output format: mp3, wav (default: mp3) |
-| `--out <dir>` | Output directory |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 
 ### transcribe
 
@@ -320,7 +319,7 @@ agent-media audio transcribe --in https://ytrzap04kkm0giml.public.blob.vercel-st
 | `--diarize` | Enable speaker identification (cloud only) |
 | `--language <code>` | Language code (auto-detected if not provided) |
 | `--speakers <n>` | Number of speakers hint |
-| `--out <dir>` | Output directory |
+| `--out <path>` | Output path, filename or directory (default: ./) |
 | `--provider <name>` | Provider (local, fal, replicate) |
 | `--model <name>` | Model override |
 
@@ -336,7 +335,7 @@ All commands return JSON to stdout:
   "media_type": "image",
   "action": "resize",
   "provider": "local",
-  "output_path": ".agent-media/resized_123_abc.png",
+  "output_path": "resized_123_abc.png",
   "mime": "image/png",
   "bytes": 45678
 }
@@ -365,7 +364,7 @@ Exit code is `0` on success, `1` on error.
 | **local** | ✓* | ✓* | ✓* | ✓* | - | - | `Xenova/modnet`** | - | `moonshine-base`** |
 | **fal** | - | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/ltx-2` | `fal-ai/wizper` |
 | **replicate** | - | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | `whisper-diarization` |
-| **runpod** | - | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | - |
+| **runpod** | - | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | `wan-2.6` | - |
 | **ai-gateway** | - | - | - | - | `bfl/flux-2-pro` | `google/gemini-3-pro-image` | - | - | - |
 
 \* Powered by [Sharp](https://sharp.pixelplumbing.com/) for fast image processing
@@ -388,7 +387,7 @@ Use `--model <name>` to override the default model for any command.
 | `REPLICATE_API_TOKEN` | Replicate API token | [replicate.com](https://replicate.com/account/api-tokens) |
 | `RUNPOD_API_KEY` | Runpod API key | [runpod.io](https://www.runpod.io/console/user/settings) |
 | `AI_GATEWAY_API_KEY` | AI Gateway API key | [vercel.com](https://vercel.com/ai-gateway) |
-| `AGENT_MEDIA_DIR` | Output directory (default: `.agent-media/`) | - |
+| `AGENT_MEDIA_DIR` | Output directory (default: current directory) | - |
 
 ## Roadmap
 

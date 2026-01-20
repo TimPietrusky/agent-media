@@ -32,7 +32,7 @@ All commands return JSON to stdout:
   "media_type": "image",
   "action": "resize",
   "provider": "local",
-  "output_path": ".agent-media/output_123.webp",
+  "output_path": "output_123.webp",
   "mime": "image/webp",
   "bytes": 12345
 }

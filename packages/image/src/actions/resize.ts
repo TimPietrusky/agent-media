@@ -30,7 +30,7 @@ export async function resize(options: ResizeInput): Promise<MediaResult> {
   };
 
   const context: ActionContext = {
-    outputDir: options.out ?? process.cwd() + '/.agent-media',
+    outputDir: options.out ?? process.cwd(),
     provider: options.provider,
     outputName: options.name,
     inputSource: options.input,

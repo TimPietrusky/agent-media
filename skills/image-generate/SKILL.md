@@ -18,10 +18,10 @@ agent-media image generate --prompt <text> [options]
 | Option | Required | Description |
 |--------|----------|-------------|
 | `--prompt` | Yes | Text description of the image to generate |
-| `--width` | No | Width of the generated image in pixels |
-| `--height` | No | Height of the generated image in pixels |
+| `--width` | No | Width of the generated image in pixels (default: 1280) |
+| `--height` | No | Height of the generated image in pixels (default: 720) |
 | `--count` | No | Number of images to generate (default: 1) |
-| `--out` | No | Output directory (default: `.agent-media/`) |
+| `--out` | No | Output path, filename or directory (default: ./) |
 | `--provider` | No | Provider to use (default: auto-detect) |
 
 ## Output
@@ -34,7 +34,7 @@ Returns a JSON object with the generated image path:
   "media_type": "image",
   "action": "generate",
   "provider": "fal",
-  "output_path": ".agent-media/generated_123_abc.png",
+  "output_path": "generated_123_abc.png",
   "mime": "image/png",
   "bytes": 567890
 }

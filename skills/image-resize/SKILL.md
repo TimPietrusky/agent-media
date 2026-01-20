@@ -20,7 +20,7 @@ agent-media image resize --in <path> [options]
 | `--in` | Yes | Input file path or URL |
 | `--width` | No | Target width in pixels |
 | `--height` | No | Target height in pixels |
-| `--out` | No | Output directory (default: `.agent-media/`) |
+| `--out` | No | Output path, filename or directory (default: ./) |
 | `--provider` | No | Provider to use (default: auto-detect) |
 
 At least one of `--width` or `--height` must be specified.
@@ -35,7 +35,7 @@ Returns a JSON object with the resized image path:
   "media_type": "image",
   "action": "resize",
   "provider": "local",
-  "output_path": ".agent-media/resized_123_abc.png",
+  "output_path": "resized_123_abc.png",
   "mime": "image/png",
   "bytes": 45678
 }
