@@ -1,5 +1,4 @@
 import { createFal } from '@ai-sdk/fal';
-import { fal } from '@fal-ai/client';
 import { generateImage, experimental_transcribe as transcribe } from 'ai';
 import { writeFile, readFile, stat } from 'node:fs/promises';
 import type {
@@ -194,8 +193,8 @@ async function executeEdit(
 }
 
 /**
- * Execute remove-background action using fal.ai birefnet/v2 model
- * Uses fal client SDK for proper API interaction
+ * Execute remove-background action using fal.ai birefnet/v2 model via AI SDK
+ * Uses generateImage with image input and minimal text prompt
  */
 async function executeRemoveBackground(
   options: RemoveBackgroundOptions,
@@ -208,56 +207,41 @@ async function executeRemoveBackground(
     return createError(ErrorCodes.INVALID_INPUT, 'Input source is required for background removal');
   }
 
-  // Configure fal client with API key
-  fal.config({ credentials: apiKey });
+  const falClient = createFal({ apiKey });
 
-  // Prepare the image URL - birefnet requires a URL
-  let imageUrl: string;
+  // Prepare the image input
+  let imageBuffer: Buffer;
   if (input.isUrl) {
-    imageUrl = input.source;
+    const response = await fetch(input.source);
+    if (!response.ok) {
+      return createError(ErrorCodes.NETWORK_ERROR, `Failed to fetch input image: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    imageBuffer = Buffer.from(arrayBuffer);
   } else {
-    // Convert local file to data URI
-    const buffer = await readFile(input.source);
-    const base64 = buffer.toString('base64');
-    const ext = input.source.toLowerCase().split('.').pop();
-    const mimeType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
-    imageUrl = `data:${mimeType};base64,${base64}`;
+    imageBuffer = await readFile(input.source);
   }
 
-  // Call birefnet/v2 via fal client SDK
-  const response = await fal.run('fal-ai/birefnet/v2', {
-    input: {
-      image_url: imageUrl,
-      model: 'General Use (Light)',
-      output_format: 'png',
-      refine_foreground: true,
+  // Use generateImage with birefnet model - image input only, minimal text
+  const { image } = await generateImage({
+    model: falClient.image('fal-ai/birefnet/v2'),
+    prompt: {
+      text: '',
+      images: [imageBuffer],
+    },
+    providerOptions: {
+      fal: {
+        model: 'General Use (Light)',
+        outputFormat: 'png',
+        refineForeground: true,
+      },
     },
   });
-
-  const result = response.data as {
-    image: {
-      url: string;
-      content_type: string;
-    };
-  };
-
-  if (!result.image?.url) {
-    return createError(ErrorCodes.PROVIDER_ERROR, 'No image returned from background removal');
-  }
-
-  // Download the processed image
-  const imageResponse = await fetch(result.image.url);
-  if (!imageResponse.ok) {
-    return createError(ErrorCodes.NETWORK_ERROR, `Failed to download processed image: ${imageResponse.statusText}`);
-  }
-
-  const arrayBuffer = await imageResponse.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
 
   const outputFilename = resolveOutputFilename('png', 'nobg', context.outputName, context.inputSource);
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
-  await writeFile(outputPath, buffer);
+  await writeFile(outputPath, image.uint8Array);
 
   const stats = await stat(outputPath);
 
