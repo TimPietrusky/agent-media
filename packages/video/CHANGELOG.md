@@ -1,5 +1,13 @@
 # @agent-media/video
 
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [df1311e]
+  - @agent-media/core@0.8.0
+  - @agent-media/providers@0.8.0
+
 ## 0.2.4
 
 ### Patch Changes

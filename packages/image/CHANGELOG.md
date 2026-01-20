@@ -1,5 +1,23 @@
 # @agent-media/image
 
+## 0.5.0
+
+### Minor Changes
+
+- df1311e: Add image crop action with configurable focal point
+
+  - New `crop` action for images using Sharp's `extract()` method
+  - Supports `--width` and `--height` for crop dimensions
+  - Supports `--focus-x` and `--focus-y` (0-100%) to control focal point (default: center)
+  - Crop region automatically clamped to image bounds
+  - Local-only processing, no API key required
+
+### Patch Changes
+
+- Updated dependencies [df1311e]
+  - @agent-media/core@0.8.0
+  - @agent-media/providers@0.8.0
+
 ## 0.4.1
 
 ### Patch Changes
