@@ -10,6 +10,7 @@ import type {
   ResizeOptions,
   ConvertOptions,
   ExtendOptions,
+  CropOptions,
 } from '@agent-media/core';
 import {
   createSuccess,
@@ -24,10 +25,10 @@ import { executeTranscribe } from '../transformers/transcribe.js';
 
 /**
  * Actions supported by the local provider
- * - Sharp: resize, convert, extend
+ * - Sharp: resize, convert, extend, crop
  * - Transformers.js: remove-background, transcribe
  */
-const SUPPORTED_ACTIONS = ['resize', 'convert', 'extend', 'remove-background', 'transcribe'];
+const SUPPORTED_ACTIONS = ['resize', 'convert', 'extend', 'crop', 'remove-background', 'transcribe'];
 
 /**
  * MIME types for image formats
@@ -98,6 +99,8 @@ export const localProvider: MediaProvider = {
           return await executeConvert(actionConfig.options, context);
         case 'extend':
           return await executeExtend(actionConfig.options, context);
+        case 'crop':
+          return await executeCrop(actionConfig.options, context);
         case 'remove-background': {
           const result = await executeBackgroundRemoval(actionConfig.options, context);
           if (result.ok) {
@@ -358,6 +361,80 @@ async function executeExtend(
     provider: 'local',
     outputPath: outputPath,
     mime: 'image/png',
+    bytes: stats.size,
+  });
+}
+
+/**
+ * Execute crop action
+ * Crops an image to specified dimensions centered on a focal point.
+ */
+async function executeCrop(
+  options: CropOptions,
+  context: ActionContext
+): Promise<MediaResult> {
+  const { input, width, height, focusX = 50, focusY = 50, dpi = 300 } = options;
+
+  const inputBuffer = await getInputBuffer(input.source, input.isUrl);
+
+  // Get image dimensions
+  const metadata = await sharp(inputBuffer).metadata();
+  const imageWidth = metadata.width || 0;
+  const imageHeight = metadata.height || 0;
+
+  // Validate crop dimensions
+  if (width > imageWidth || height > imageHeight) {
+    return createError(
+      ErrorCodes.INVALID_INPUT,
+      `Crop dimensions (${width}x${height}) exceed image dimensions (${imageWidth}x${imageHeight})`
+    );
+  }
+
+  // Calculate crop region centered on focal point
+  const centerX = Math.round((focusX / 100) * imageWidth);
+  const centerY = Math.round((focusY / 100) * imageHeight);
+
+  let left = centerX - Math.round(width / 2);
+  let top = centerY - Math.round(height / 2);
+
+  // Clamp to image bounds
+  left = Math.max(0, Math.min(left, imageWidth - width));
+  top = Math.max(0, Math.min(top, imageHeight - height));
+
+  // Get output format from original image
+  const outputFormat = (metadata.format as ImageFormat) || 'png';
+
+  // Apply crop
+  let pipeline = sharp(inputBuffer).extract({
+    left,
+    top,
+    width,
+    height,
+  });
+
+  // Set DPI metadata
+  pipeline = pipeline.withMetadata({
+    density: dpi,
+  });
+
+  const outputFilename = resolveOutputFilename(
+    getFormatExtension(outputFormat),
+    'cropped',
+    context.outputName,
+    context.inputSource
+  );
+  const outputPath = getOutputPath(context.outputDir, outputFilename);
+
+  await pipeline.toFile(outputPath);
+
+  const stats = await stat(outputPath);
+
+  return createSuccess({
+    mediaType: 'image',
+    action: 'crop',
+    provider: 'local',
+    outputPath: outputPath,
+    mime: MIME_TYPES[outputFormat] ?? 'application/octet-stream',
     bytes: stats.size,
   });
 }

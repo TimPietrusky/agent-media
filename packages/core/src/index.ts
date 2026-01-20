@@ -15,6 +15,7 @@ export type {
   GenerateOptions,
   ExtendOptions,
   EditOptions,
+  CropOptions,
   ExtractOptions,
   TranscriptionSegment,
   TranscriptionData,

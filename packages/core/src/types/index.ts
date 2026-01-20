@@ -6,7 +6,7 @@ export type MediaType = 'image' | 'video' | 'audio';
 /**
  * Supported image actions
  */
-export type ImageAction = 'resize' | 'convert' | 'remove-background' | 'generate' | 'extend' | 'edit';
+export type ImageAction = 'resize' | 'convert' | 'remove-background' | 'generate' | 'extend' | 'edit' | 'crop';
 
 /**
  * Supported audio actions
@@ -123,6 +123,23 @@ export interface EditOptions {
 }
 
 /**
+ * Options for crop action
+ */
+export interface CropOptions {
+  input: MediaInput;
+  /** Width of the crop area in pixels */
+  width: number;
+  /** Height of the crop area in pixels */
+  height: number;
+  /** Focal point X position as percentage (0-100, default: 50) */
+  focusX?: number;
+  /** Focal point Y position as percentage (0-100, default: 50) */
+  focusY?: number;
+  /** DPI/density for output image metadata */
+  dpi?: number;
+}
+
+/**
  * A segment of transcribed text with timing information
  */
 export interface TranscriptionSegment {
@@ -205,6 +222,7 @@ export type ActionOptions =
   | { action: 'generate'; options: GenerateOptions }
   | { action: 'extend'; options: ExtendOptions }
   | { action: 'edit'; options: EditOptions }
+  | { action: 'crop'; options: CropOptions }
   | { action: 'extract'; options: ExtractOptions }
   | { action: 'transcribe'; options: TranscribeOptions }
   | { action: 'video-generate'; options: VideoGenerateOptions };
