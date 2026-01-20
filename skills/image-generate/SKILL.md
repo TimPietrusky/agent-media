@@ -63,5 +63,6 @@ This action requires an external provider:
 - **fal** - Requires `FAL_API_KEY`
 - **replicate** - Requires `REPLICATE_API_TOKEN`
 - **runpod** - Requires `RUNPOD_API_KEY`
+- **ai-gateway** - Requires `AI_GATEWAY_API_KEY`
 
 The local provider does not support image generation.
