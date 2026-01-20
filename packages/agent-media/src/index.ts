@@ -108,7 +108,7 @@ imageCommand
   .requiredOption('--in <path>', 'Input file path or URL')
   .option('--out <path>', 'Output directory')
   .option('--name <filename>', 'Output filename (extension auto-added if missing)')
-  .option('--provider <name>', 'Provider to use (fal, replicate)')
+  .option('--provider <name>', 'Provider to use (local, fal, replicate)')
   .option('--model <name>', 'Model to use (overrides provider default)')
   .action(async (options: {
     in: string;
@@ -331,7 +331,7 @@ audioCommand
   .option('--language <code>', 'Language code (auto-detected if not provided)')
   .option('--speakers <number>', 'Number of speakers hint', parseInt)
   .option('--out <path>', 'Output directory')
-  .option('--provider <name>', 'Provider to use (fal, replicate)')
+  .option('--provider <name>', 'Provider to use (local, fal, replicate)')
   .option('--model <name>', 'Model to use (overrides provider default)')
   .action(async (options: {
     in: string;
