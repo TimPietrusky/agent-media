@@ -94,6 +94,8 @@ export interface GenerateOptions {
   count?: number;
   /** Override default model (e.g., "fal-ai/flux-2", "black-forest-labs/flux-2-dev") */
   model?: string;
+  /** Seed for reproducible image generation */
+  seed?: number;
 }
 
 /**

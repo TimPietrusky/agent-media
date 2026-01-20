@@ -58,17 +58,79 @@ skills/           # SKILL.md definitions for AI agent discovery (npx skills add 
 - [Sharp](https://sharp.pixelplumbing.com/) for image processing (resize, convert, extend)
 - [Transformers.js](https://huggingface.co/docs/transformers.js) for ML inference (remove-background with Xenova/modnet, transcribe with Moonshine)
 
-**Fal Provider**: Uses @ai-sdk/fal for image generation (fal-ai/flux-2), editing (fal-ai/flux-2/edit), and background removal (birefnet/v2). Requires `FAL_API_KEY`.
+**Cloud Providers (Fal, Replicate, Runpod)**: All cloud providers use AI SDK as the primary interface. See "AI SDK Usage Pattern" below.
 
-**Replicate Provider**: Uses @ai-sdk/replicate for image generation (black-forest-labs/flux-2-dev), editing (black-forest-labs/flux-kontext-dev), and background removal (birefnet). Requires `REPLICATE_API_TOKEN`.
+**Input Support**: All providers support both local file paths and URLs as input via `readFile()` → Buffer.
 
-**Runpod Provider**: Uses @runpod/ai-sdk-provider for image generation (alibaba/wan-2.6) and image editing (google/nano-banana-pro-edit). Requires `RUNPOD_API_KEY`.
+### AI SDK Usage Pattern
 
-**Input Support**: All providers support both local file paths and URLs as input. Local files are handled via:
-- Local provider: `createReadStream()` → Buffer → Sharp
-- Fal provider: `readFile()` → base64 data URI (images) or `fal.storage.upload()` (audio)
-- Replicate provider: `readFile()` → Buffer (images) or data URI (audio)
-- Runpod provider: `readFile()` → Buffer
+**IMPORTANT**: Cloud providers MUST use [AI SDK](https://sdk.vercel.ai/) (`ai` package) as the primary interface. Never use raw `fetch()` calls to provider APIs.
+
+**Hierarchy of SDK usage:**
+1. **AI SDK first** - Use `generateImage()`, `transcribe()`, etc. from `ai` package with provider-specific clients (`@ai-sdk/fal`, `@ai-sdk/replicate`, `@runpod/ai-sdk-provider`)
+2. **Provider SDK fallback** - Only use provider SDKs (`@fal-ai/client`, `replicate`) when AI SDK doesn't support the operation (e.g., video generation)
+3. **Never raw fetch** - Do not write raw `fetch()` calls to provider APIs
+
+**Image operations with AI SDK:**
+
+```typescript
+import { generateImage } from 'ai';
+import { createFal } from '@ai-sdk/fal';
+
+const fal = createFal({ apiKey });
+
+// Text-to-image generation
+const { image } = await generateImage({
+  model: fal.image('fal-ai/flux-2'),
+  prompt: 'A sunset over mountains',
+  size: '1024x1024',
+});
+
+// Image editing (text + image input)
+const { image } = await generateImage({
+  model: fal.image('fal-ai/flux-2/edit'),
+  prompt: {
+    text: 'Add sunglasses',
+    images: [imageBuffer],
+  },
+  providerOptions: {
+    fal: { image_urls: [dataUrl] },  // Provider-specific options
+  },
+});
+
+// Background removal (image input only, no text needed)
+const { image } = await generateImage({
+  model: fal.image('fal-ai/birefnet/v2'),
+  prompt: {
+    text: '',  // Empty text is valid
+    images: [imageBuffer],
+  },
+});
+```
+
+**Transcription with AI SDK:**
+
+```typescript
+import { experimental_transcribe as transcribe } from 'ai';
+
+const result = await transcribe({
+  model: fal.transcription('wizper'),
+  audio: audioBuffer,  // Buffer, Uint8Array, or URL string
+  providerOptions: {
+    fal: { chunkLevel: 'segment' },
+  },
+});
+```
+
+**Current provider capabilities:**
+
+| Provider | generate | edit | remove-background | transcribe | video-generate |
+|----------|----------|------|-------------------|------------|----------------|
+| **fal** | AI SDK | AI SDK | AI SDK | AI SDK | fal client SDK |
+| **replicate** | AI SDK | AI SDK | AI SDK | replicate SDK* | replicate SDK |
+| **runpod** | AI SDK | AI SDK | - | - | - |
+
+*AI SDK `@ai-sdk/replicate` doesn't support `.transcription()` method, so we use `replicate` npm package.
 
 ### Adding a New Provider
 

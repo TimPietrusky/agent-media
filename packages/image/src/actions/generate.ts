@@ -10,6 +10,8 @@ export interface GenerateInput {
   height?: number;
   /** Number of images to generate (default: 1) */
   count?: number;
+  /** Seed for reproducible image generation */
+  seed?: number;
   /** Output directory (overrides default) */
   out?: string;
   /** Output filename (extension auto-added if missing) */
@@ -41,6 +43,7 @@ export async function generate(options: GenerateInput): Promise<MediaResult> {
         width: options.width,
         height: options.height,
         count: options.count,
+        seed: options.seed,
         model: options.model,
       },
     },

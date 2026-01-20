@@ -1,8 +1,11 @@
 /**
  * Video generation abstraction layer
  * Provides consistent interface for video generation since AI SDK doesn't support video
+ * Uses provider SDKs (fal client, replicate) instead of raw fetch
  */
 
+import { fal } from '@fal-ai/client';
+import Replicate from 'replicate';
 import { readFile } from 'node:fs/promises';
 import type { VideoResolution, VideoFps } from '@agent-media/core';
 
@@ -74,7 +77,7 @@ async function prepareImageInput(imagePath: string, isUrl: boolean): Promise<str
 }
 
 /**
- * Generate video using Fal.ai LTX-2 model
+ * Generate video using Fal.ai LTX-2 model via fal client SDK
  * Uses text-to-video or image-to-video endpoint based on input
  */
 export async function generateVideoFal(
@@ -91,16 +94,19 @@ export async function generateVideoFal(
     generateAudio = false,
   } = config;
 
+  // Configure fal client with API key
+  fal.config({ credentials: apiKey });
+
   const { width, height } = getResolutionDimensions(resolution);
 
-  // Determine endpoint based on whether we have an input image
+  // Determine model based on whether we have an input image
   const isImageToVideo = !!inputImage;
-  const endpoint = isImageToVideo
-    ? 'https://fal.run/fal-ai/ltx-2/image-to-video/fast'
-    : 'https://fal.run/fal-ai/ltx-2/text-to-video/fast';
+  const model = isImageToVideo
+    ? 'fal-ai/ltx-2/image-to-video/fast'
+    : 'fal-ai/ltx-2/text-to-video/fast';
 
-  // Build request body
-  const requestBody: Record<string, unknown> = {
+  // Build request input
+  const requestInput: Record<string, unknown> = {
     prompt,
     duration,
     fps,
@@ -111,31 +117,21 @@ export async function generateVideoFal(
   // Add image input if provided
   if (isImageToVideo && inputImage) {
     const imageUrl = await prepareImageInput(inputImage, inputIsUrl);
-    requestBody['image_url'] = imageUrl;
+    requestInput['image_url'] = imageUrl;
   }
 
   // Add audio generation if requested
   if (generateAudio) {
-    requestBody['audio'] = {
+    requestInput['audio'] = {
       enabled: true,
     };
   }
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Key ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody),
-  });
+  // Call fal via SDK (handles auth and request formatting)
+  // Using type assertion for dynamic model selection
+  const response = await (fal.run as (endpoint: string, options: { input: unknown }) => Promise<{ data: unknown }>)(model, { input: requestInput });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Fal API error: ${response.status} - ${errorText}`);
-  }
-
-  const result = await response.json() as {
+  const result = response.data as {
     video?: { url: string; content_type?: string };
   };
 
@@ -150,8 +146,8 @@ export async function generateVideoFal(
 }
 
 /**
- * Generate video using Replicate lightricks/ltx-video model
- * Uses polling API since video generation takes time
+ * Generate video using Replicate lightricks/ltx-video model via Replicate SDK
+ * SDK handles polling automatically
  */
 export async function generateVideoReplicate(
   config: VideoGenerationConfig,
@@ -165,6 +161,9 @@ export async function generateVideoReplicate(
     resolution = '720p',
     fps = 25,
   } = config;
+
+  // Initialize Replicate client
+  const replicate = new Replicate({ auth: apiToken });
 
   const { width, height } = getResolutionDimensions(resolution);
 
@@ -186,70 +185,13 @@ export async function generateVideoReplicate(
     input['image'] = imageUrl;
   }
 
-  // Create prediction
-  const response = await fetch('https://api.replicate.com/v1/predictions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'lightricks/ltx-video',
-      input,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Replicate API error: ${response.status} - ${errorText}`);
-  }
-
-  const prediction = await response.json() as {
-    id: string;
-    status: string;
-    output?: string | string[];
-    urls?: { get: string };
-    error?: string;
-  };
-
-  // Poll for completion
-  const maxAttempts = 180; // 15 minutes max (video generation can take a while)
-  let attempts = 0;
-  let result = prediction;
-
-  while (attempts < maxAttempts && result.status !== 'succeeded' && result.status !== 'failed') {
-    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-
-    if (!result.urls?.get) {
-      throw new Error('No polling URL returned from Replicate');
-    }
-
-    const pollResponse = await fetch(result.urls.get, {
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-      },
-    });
-
-    if (!pollResponse.ok) {
-      throw new Error(`Failed to poll prediction status: ${pollResponse.status}`);
-    }
-
-    result = await pollResponse.json() as typeof prediction;
-    attempts++;
-  }
-
-  if (result.status === 'failed') {
-    throw new Error(result.error || 'Video generation failed');
-  }
-
-  if (attempts >= maxAttempts) {
-    throw new Error('Video generation timed out');
-  }
+  // Call Replicate via SDK (handles polling automatically)
+  const output = await replicate.run('lightricks/ltx-video', { input });
 
   // Extract output URL
-  const outputUrl = Array.isArray(result.output) ? result.output[0] : result.output;
+  const outputUrl = Array.isArray(output) ? output[0] : output;
 
-  if (!outputUrl) {
+  if (!outputUrl || typeof outputUrl !== 'string') {
     throw new Error('No video returned from Replicate');
   }
 

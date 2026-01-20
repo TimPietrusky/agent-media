@@ -1,4 +1,5 @@
 import { createReplicate } from '@ai-sdk/replicate';
+import Replicate from 'replicate';
 import { generateImage } from 'ai';
 import { writeFile, readFile, stat } from 'node:fs/promises';
 import type {
@@ -89,7 +90,7 @@ async function executeGenerate(
   context: ActionContext,
   apiToken: string
 ): Promise<MediaResult> {
-  const { prompt, width = 1024, height = 1024, model } = options;
+  const { prompt, width = 1024, height = 1024, model, seed } = options;
 
   if (!prompt) {
     return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image generation');
@@ -102,6 +103,7 @@ async function executeGenerate(
     model: replicateClient.image(modelId),
     prompt,
     size: `${width}x${height}`,
+    seed,
   });
 
   const outputFilename = resolveOutputFilename('webp', 'generated', context.outputName);
@@ -122,7 +124,7 @@ async function executeGenerate(
 }
 
 /**
- * Execute edit action using Replicate flux-kontext model
+ * Execute edit action using Replicate flux-kontext model via AI SDK
  * Default model: black-forest-labs/flux-kontext-dev
  */
 async function executeEdit(
@@ -140,98 +142,45 @@ async function executeEdit(
     return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image editing');
   }
 
-  // Prepare the image input
-  let imageUrl: string;
+  // Prepare the image as a data URL for the replicate API
+  let imageDataUrl: string;
   if (input.isUrl) {
-    imageUrl = input.source;
+    // For URLs, fetch and convert to data URL
+    const response = await fetch(input.source);
+    if (!response.ok) {
+      return createError(ErrorCodes.NETWORK_ERROR, `Failed to fetch input image: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64 = buffer.toString('base64');
+    const contentType = response.headers.get('content-type') || 'image/png';
+    imageDataUrl = `data:${contentType};base64,${base64}`;
   } else {
-    // Convert local file to data URI
+    // For local files, read and convert to data URL
     const buffer = await readFile(input.source);
     const base64 = buffer.toString('base64');
     const ext = input.source.toLowerCase().split('.').pop();
     const mimeType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
-    imageUrl = `data:${mimeType};base64,${base64}`;
+    imageDataUrl = `data:${mimeType};base64,${base64}`;
   }
 
+  const replicateClient = createReplicate({ apiToken });
   const modelId = model || 'black-forest-labs/flux-kontext-dev';
 
-  // Call the edit model via Replicate API
-  const response = await fetch('https://api.replicate.com/v1/predictions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiToken}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'wait',
-    },
-    body: JSON.stringify({
-      model: modelId,
-      input: {
-        image: imageUrl,
-        prompt,
+  const { image } = await generateImage({
+    model: replicateClient.image(modelId),
+    prompt,
+    providerOptions: {
+      replicate: {
+        image: imageDataUrl,
       },
-    }),
+    },
   });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    return createError(ErrorCodes.API_ERROR, `Replicate API error: ${response.status} - ${errorText}`);
-  }
-
-  const result = await response.json() as {
-    output?: string | string[];
-    status?: string;
-    error?: string;
-    urls?: { get: string };
-  };
-
-  // Handle async predictions (poll if needed)
-  let outputUrl: string | undefined;
-  if (result.status === 'succeeded' && result.output) {
-    outputUrl = Array.isArray(result.output) ? result.output[0] : result.output;
-  } else if (result.status === 'processing' && result.urls?.get) {
-    // Poll for completion
-    const maxAttempts = 60;
-    let attempts = 0;
-    while (attempts < maxAttempts) {
-      const pollResponse = await fetch(result.urls.get, {
-        headers: { 'Authorization': `Bearer ${apiToken}` },
-      });
-      const pollResult = await pollResponse.json() as typeof result;
-
-      if (pollResult.status === 'succeeded' && pollResult.output) {
-        outputUrl = Array.isArray(pollResult.output) ? pollResult.output[0] : pollResult.output;
-        break;
-      } else if (pollResult.status === 'failed') {
-        return createError(ErrorCodes.PROVIDER_ERROR, pollResult.error || 'Edit failed');
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      attempts++;
-    }
-    if (!outputUrl) {
-      return createError(ErrorCodes.PROVIDER_ERROR, 'Edit timed out');
-    }
-  } else if (result.output) {
-    outputUrl = Array.isArray(result.output) ? result.output[0] : result.output;
-  }
-
-  if (!outputUrl) {
-    return createError(ErrorCodes.PROVIDER_ERROR, 'No image returned from edit operation');
-  }
-
-  // Download the edited image
-  const imageResponse = await fetch(outputUrl);
-  if (!imageResponse.ok) {
-    return createError(ErrorCodes.NETWORK_ERROR, `Failed to download edited image: ${imageResponse.statusText}`);
-  }
-
-  const arrayBuffer = await imageResponse.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
 
   const outputFilename = resolveOutputFilename('webp', 'edited', context.outputName, context.inputSource);
   const outputPath = getOutputPath(context.outputDir, outputFilename);
 
-  await writeFile(outputPath, buffer);
+  await writeFile(outputPath, image.uint8Array);
 
   const stats = await stat(outputPath);
 
@@ -316,109 +265,56 @@ async function executeTranscribe(
     return createError(ErrorCodes.INVALID_INPUT, 'Input source is required for transcription');
   }
 
-  // Build request body for whisper-diarization
-  const requestBody: Record<string, unknown> = {};
+  // Initialize Replicate client
+  const replicate = new Replicate({ auth: apiToken });
+
+  // Build request input for whisper-diarization
+  const requestInput: Record<string, unknown> = {};
 
   // Prepare the audio input
   if (input.isUrl) {
-    requestBody['file_url'] = input.source;
+    requestInput['file_url'] = input.source;
   } else {
     // Convert local file to base64
     const buffer = await readFile(input.source);
     const base64 = buffer.toString('base64');
-    requestBody['file_string'] = base64;
+    requestInput['file_string'] = base64;
   }
 
   if (numSpeakers) {
-    requestBody['num_speakers'] = numSpeakers;
+    requestInput['num_speakers'] = numSpeakers;
   }
 
   if (language) {
-    requestBody['language'] = language;
+    requestInput['language'] = language;
   }
 
-  // Call whisper-diarization via Replicate API
-  const response = await fetch('https://api.replicate.com/v1/predictions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      version: '1495a9cddc83b2203b0d8d3516e38b80fd1572ebc4bc5700ac1da56a9b3ed886',
-      input: requestBody,
-    }),
-  });
+  // Call whisper-diarization via Replicate SDK (handles polling automatically)
+  const output = await replicate.run(
+    'thomasmol/whisper-diarization:1495a9cddc83b2203b0d8d3516e38b80fd1572ebc4bc5700ac1da56a9b3ed886',
+    { input: requestInput }
+  );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    return createError(ErrorCodes.API_ERROR, `Replicate API error: ${response.status} - ${errorText}`);
-  }
-
-  const prediction = await response.json() as {
-    id: string;
-    status: string;
-    urls: { get: string };
+  const result = output as {
+    language?: string;
+    num_speakers?: number;
+    segments?: Array<{
+      start: number;
+      end: number;
+      text: string;
+      speaker?: string;
+    }>;
   };
 
-  // Poll for completion
-  let result: {
-    status: string;
-    output?: {
-      language?: string;
-      num_speakers?: number;
-      segments?: Array<{
-        start: number;
-        end: number;
-        text: string;
-        speaker?: string;
-      }>;
-    };
-    error?: string;
-  };
-
-  const maxAttempts = 120; // 10 minutes max
-  let attempts = 0;
-
-  while (attempts < maxAttempts) {
-    const pollResponse = await fetch(prediction.urls.get, {
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-      },
-    });
-
-    if (!pollResponse.ok) {
-      return createError(ErrorCodes.API_ERROR, `Failed to poll prediction status`);
-    }
-
-    result = await pollResponse.json() as typeof result;
-
-    if (result.status === 'succeeded') {
-      break;
-    } else if (result.status === 'failed') {
-      return createError(ErrorCodes.PROVIDER_ERROR, result.error || 'Transcription failed');
-    } else if (result.status === 'canceled') {
-      return createError(ErrorCodes.PROVIDER_ERROR, 'Transcription was canceled');
-    }
-
-    // Wait 5 seconds before polling again
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    attempts++;
-  }
-
-  if (attempts >= maxAttempts) {
-    return createError(ErrorCodes.PROVIDER_ERROR, 'Transcription timed out');
-  }
-
-  if (!result!.output) {
+  if (!result) {
     return createError(ErrorCodes.PROVIDER_ERROR, 'No output from transcription');
   }
 
   // Transform to our TranscriptionData format
-  const segments = result!.output.segments || [];
+  const segments = result.segments || [];
   const transcription: TranscriptionData = {
     text: segments.map(s => s.text).join(' '),
-    language: result!.output.language || language || 'unknown',
+    language: result.language || language || 'unknown',
     segments: segments.map(segment => ({
       start: segment.start,
       end: segment.end,
