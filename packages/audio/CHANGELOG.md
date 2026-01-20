@@ -1,5 +1,13 @@
 # @agent-media/audio
 
+## 0.4.4
+
+### Patch Changes
+
+- Updated dependencies [8be70eb]
+  - @agent-media/core@0.6.0
+  - @agent-media/providers@0.6.0
+
 ## 0.4.3
 
 ### Patch Changes
