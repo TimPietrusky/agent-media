@@ -42,8 +42,10 @@ npx skills add agntswrm/agent-media
 This adds media processing skills that your AI agent can use automatically. Available skills:
 - `agent-media` - Overview of all capabilities
 - `image-generate` - Generate images from text
+- `image-edit` - Edit images with text prompts
 - `image-resize` - Resize images
 - `image-convert` - Convert image formats
+- `image-extend` - Extend image canvas with padding
 - `image-remove-background` - Remove backgrounds
 - `image-crop` - Crop images to specified dimensions
 - `audio-extract` - Extract audio from video
