@@ -1,5 +1,22 @@
 # @agent-media/providers
 
+## 0.8.0
+
+### Minor Changes
+
+- 58837d4: Add image crop action with configurable focal point
+
+  - New `crop` action for images using Sharp's `extract()` method
+  - Supports `--width` and `--height` for crop dimensions
+  - Supports `--focus-x` and `--focus-y` (0-100%) to control focal point (default: center)
+  - Crop region automatically clamped to image bounds
+  - Local-only processing, no API key required
+
+### Patch Changes
+
+- Updated dependencies [58837d4]
+  - @agent-media/core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

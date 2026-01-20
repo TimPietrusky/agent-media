@@ -1,6 +1,6 @@
 {
   "name": "@agent-media/core",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Core types and utilities for agent-media toolkit",
   "license": "Apache-2.0",
   "repository": {
