@@ -1,5 +1,11 @@
 # agent-media
 
+## 0.9.1
+
+### Patch Changes
+
+- cc309c8: Fix documentation to correctly show that remove-background and transcribe support both local and cloud providers
+
 ## 0.9.0
 
 ### Minor Changes
