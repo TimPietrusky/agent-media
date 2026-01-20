@@ -143,7 +143,7 @@ imageCommand
   .option('--seed <number>', 'Seed for reproducible image generation', parseInt)
   .option('--out <path>', 'Output directory')
   .option('--name <filename>', 'Output filename (extension auto-added if missing)')
-  .option('--provider <name>', 'Provider to use (fal, replicate, runpod)')
+  .option('--provider <name>', 'Provider to use (fal, replicate, runpod, ai-gateway)')
   .option('--model <name>', 'Model to use (overrides provider default, e.g., fal-ai/flux-2)')
   .action(async (options: {
     prompt: string;
@@ -220,7 +220,7 @@ imageCommand
   .requiredOption('--prompt <text>', 'Text description of the desired edit')
   .option('--out <path>', 'Output directory')
   .option('--name <filename>', 'Output filename (extension auto-added if missing)')
-  .option('--provider <name>', 'Provider to use (fal, replicate, runpod)')
+  .option('--provider <name>', 'Provider to use (fal, replicate, runpod, ai-gateway)')
   .option('--model <name>', 'Model to use (overrides provider default, e.g., fal-ai/flux-2/edit)')
   .action(async (options: {
     in: string;

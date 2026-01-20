@@ -8,6 +8,7 @@ const ENV_PROVIDER_MAP: Record<string, string> = {
   FAL_API_KEY: 'fal',
   REPLICATE_API_TOKEN: 'replicate',
   RUNPOD_API_KEY: 'runpod',
+  AI_GATEWAY_API_KEY: 'ai-gateway',
 };
 
 /**

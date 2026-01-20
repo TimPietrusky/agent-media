@@ -4,6 +4,7 @@ import { transformersProvider } from './transformers/index.js';
 import { falProvider } from './fal/index.js';
 import { replicateProvider } from './replicate/index.js';
 import { runpodProvider } from './runpod/index.js';
+import { aiGatewayProvider } from './ai-gateway/index.js';
 
 // Export individual providers
 export { localProvider } from './local/index.js';
@@ -11,6 +12,7 @@ export { transformersProvider } from './transformers/index.js';
 export { falProvider } from './fal/index.js';
 export { replicateProvider } from './replicate/index.js';
 export { runpodProvider } from './runpod/index.js';
+export { aiGatewayProvider } from './ai-gateway/index.js';
 
 /**
  * All available providers
@@ -21,6 +23,7 @@ export const providers = {
   fal: falProvider,
   replicate: replicateProvider,
   runpod: runpodProvider,
+  'ai-gateway': aiGatewayProvider,
 };
 
 /**
@@ -34,6 +37,7 @@ export function registerAllProviders(): void {
   globalRegistry.register(falProvider);
   globalRegistry.register(replicateProvider);
   globalRegistry.register(runpodProvider);
+  globalRegistry.register(aiGatewayProvider);
 }
 
 /**

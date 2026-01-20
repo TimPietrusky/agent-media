@@ -35,6 +35,10 @@
     "./transformers": {
       "types": "./dist/transformers/index.d.ts",
       "import": "./dist/transformers/index.js"
+    },
+    "./ai-gateway": {
+      "types": "./dist/ai-gateway/index.d.ts",
+      "import": "./dist/ai-gateway/index.js"
     }
   },
   "files": [

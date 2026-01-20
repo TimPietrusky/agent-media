@@ -53,9 +53,10 @@ On error:
 ## Providers
 
 - **local** - Default provider using Sharp (resize, convert) and Transformers.js (remove-background, transcribe)
-- **fal** - fal.ai provider (generate, remove-background, transcribe, video)
-- **replicate** - Replicate API (generate, remove-background, transcribe, video)
-- **runpod** - Runpod API (generate only)
+- **fal** - fal.ai provider (generate, edit, remove-background, transcribe, video)
+- **replicate** - Replicate API (generate, edit, remove-background, transcribe, video)
+- **runpod** - Runpod API (generate, edit)
+- **ai-gateway** - Vercel AI Gateway (generate, edit)
 
 ## Provider Selection
 
@@ -69,3 +70,4 @@ On error:
 - `FAL_API_KEY` - Enable fal provider
 - `REPLICATE_API_TOKEN` - Enable replicate provider
 - `RUNPOD_API_KEY` - Enable runpod provider
+- `AI_GATEWAY_API_KEY` - Enable ai-gateway provider

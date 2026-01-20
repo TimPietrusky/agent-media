@@ -77,7 +77,7 @@ agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
 ## Requirements
 
 - Node.js >= 18.0.0
-- API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), or [Runpod](https://www.runpod.io/console/user/settings) for AI features
+- API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), [Runpod](https://www.runpod.io/console/user/settings), or [AI Gateway](https://vercel.com/ai-gateway) for AI features
 
 **Local processing** (no API key): resize, convert, extend, audio extract, remove-background, transcribe
 
@@ -166,8 +166,8 @@ agent-media image generate --prompt "sunset over mountains" --width 1024 --heigh
 | `--width <px>` | Width (default: 1024) |
 | `--height <px>` | Height (default: 1024) |
 | `--out <dir>` | Output directory |
-| `--provider <name>` | Provider (fal, replicate, runpod) |
-| `--model <name>` | Model override (e.g., `fal-ai/flux-2`, `black-forest-labs/flux-2-dev`) |
+| `--provider <name>` | Provider (fal, replicate, runpod, ai-gateway) |
+| `--model <name>` | Model override (e.g., `fal-ai/flux-2`, `bfl/flux-2-pro`) |
 
 ### edit
 
@@ -185,8 +185,8 @@ agent-media image edit --in https://ytrzap04kkm0giml.public.blob.vercel-storage.
 | `--in <path>` | Input file path or URL (required) |
 | `--prompt <text>` | Text description of the desired edit (required) |
 | `--out <dir>` | Output directory |
-| `--provider <name>` | Provider (fal, replicate, runpod) |
-| `--model <name>` | Model override (e.g., `fal-ai/flux-2/edit`) |
+| `--provider <name>` | Provider (fal, replicate, runpod, ai-gateway) |
+| `--model <name>` | Model override (e.g., `fal-ai/flux-2/edit`, `google/gemini-3-pro-image`) |
 
 ### remove-background
 
@@ -342,6 +342,7 @@ Exit code is `0` on success, `1` on error.
 | **fal** | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/ltx-2` | `fal-ai/wizper` |
 | **replicate** | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | `whisper-diarization` |
 | **runpod** | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | - |
+| **ai-gateway** | - | - | - | `bfl/flux-2-pro` | `google/gemini-3-pro-image` | - | - | - |
 
 \* Powered by [Sharp](https://sharp.pixelplumbing.com/) for fast image processing
 \** Powered by [Transformers.js](https://huggingface.co/docs/transformers.js) for local ML inference (models downloaded on first use)
@@ -351,7 +352,7 @@ Use `--model <name>` to override the default model for any command.
 ### Provider Selection
 
 1. **Explicit flag** (highest priority): `--provider fal`
-2. **Environment auto-detect**: Set `FAL_API_KEY` to auto-select fal
+2. **Environment auto-detect**: Set `FAL_API_KEY`, `REPLICATE_API_TOKEN`, `RUNPOD_API_KEY`, or `AI_GATEWAY_API_KEY` to auto-select that provider
 3. **Fallback to local**: For resize/convert when no provider specified
 4. **First supporting provider**: For generate/remove-background
 
@@ -362,6 +363,7 @@ Use `--model <name>` to override the default model for any command.
 | `FAL_API_KEY` | fal.ai API key | [fal.ai](https://fal.ai/dashboard/keys) |
 | `REPLICATE_API_TOKEN` | Replicate API token | [replicate.com](https://replicate.com/account/api-tokens) |
 | `RUNPOD_API_KEY` | Runpod API key | [runpod.io](https://www.runpod.io/console/user/settings) |
+| `AI_GATEWAY_API_KEY` | AI Gateway API key | [vercel.com](https://vercel.com/ai-gateway) |
 | `AGENT_MEDIA_DIR` | Output directory (default: `.agent-media/`) | - |
 
 ## Roadmap

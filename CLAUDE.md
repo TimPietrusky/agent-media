@@ -18,6 +18,12 @@ pnpm clean
 # Type-check without emitting
 pnpm typecheck
 
+# Run end-to-end tests (requires API keys in .env)
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
 # Run the CLI locally during development
 node packages/agent-media/dist/index.js image <action> [options]
 ```
@@ -33,7 +39,7 @@ packages/
 ├── image/        # Image action implementations (resize, convert, generate, remove-background, extend, edit)
 ├── audio/        # Audio action implementations (extract, transcribe)
 ├── video/        # Reserved for future video-specific actions
-└── providers/    # Provider implementations (local, fal.ai, replicate, runpod)
+└── providers/    # Provider implementations (local, fal.ai, replicate, runpod, ai-gateway)
 
 skills/           # SKILL.md definitions for AI agent discovery (npx skills add agntswrm/agent-media)
 ```
@@ -58,7 +64,7 @@ skills/           # SKILL.md definitions for AI agent discovery (npx skills add 
 - [Sharp](https://sharp.pixelplumbing.com/) for image processing (resize, convert, extend)
 - [Transformers.js](https://huggingface.co/docs/transformers.js) for ML inference (remove-background with Xenova/modnet, transcribe with Moonshine)
 
-**Cloud Providers (Fal, Replicate, Runpod)**: All cloud providers use AI SDK as the primary interface. See "AI SDK Usage Pattern" below.
+**Cloud Providers (Fal, Replicate, Runpod, AI Gateway)**: All cloud providers use AI SDK as the primary interface. See "AI SDK Usage Pattern" below.
 
 **Input Support**: All providers support both local file paths and URLs as input via `readFile()` → Buffer.
 
@@ -129,8 +135,11 @@ const result = await transcribe({
 | **fal** | AI SDK | AI SDK | AI SDK | AI SDK | fal client SDK |
 | **replicate** | AI SDK | AI SDK | AI SDK | replicate SDK* | replicate SDK |
 | **runpod** | AI SDK | AI SDK | - | - | - |
+| **ai-gateway** | AI SDK | AI SDK** | - | - | - |
 
 *AI SDK `@ai-sdk/replicate` doesn't support `.transcription()` method, so we use `replicate` npm package.
+
+**AI Gateway edit uses `generateText()` with multimodal models (Google Nano Banana Pro), images returned in `result.files`.
 
 ### Adding a New Provider
 
@@ -159,6 +168,7 @@ const result = await transcribe({
 - `FAL_API_KEY` - fal provider (generate, remove-background, transcribe)
 - `REPLICATE_API_TOKEN` - replicate provider (generate, remove-background, transcribe)
 - `RUNPOD_API_KEY` - runpod provider (generate, edit)
+- `AI_GATEWAY_API_KEY` - ai-gateway provider (generate, edit)
 - `AGENT_MEDIA_DIR` - Custom output directory (default: `.agent-media/`)
 
 ## Commit Workflow
