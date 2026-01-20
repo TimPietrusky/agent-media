@@ -84,7 +84,8 @@ async function executeGenerate(
   context: ActionContext,
   apiKey: string
 ): Promise<MediaResult> {
-  const { prompt, width = 1280, height = 720, seed } = options;
+  // RunPod only supports specific sizes, 1024x1024 is the default
+  const { prompt, width = 1024, height = 1024, seed } = options;
 
   if (!prompt) {
     return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image generation');
