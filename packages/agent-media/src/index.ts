@@ -140,6 +140,7 @@ imageCommand
   .option('--width <pixels>', 'Width of the generated image', parseInt)
   .option('--height <pixels>', 'Height of the generated image', parseInt)
   .option('--count <number>', 'Number of images to generate', parseInt)
+  .option('--seed <number>', 'Seed for reproducible image generation', parseInt)
   .option('--out <path>', 'Output directory')
   .option('--name <filename>', 'Output filename (extension auto-added if missing)')
   .option('--provider <name>', 'Provider to use (fal, replicate, runpod)')
@@ -149,6 +150,7 @@ imageCommand
     width?: number;
     height?: number;
     count?: number;
+    seed?: number;
     out?: string;
     name?: string;
     provider?: string;
@@ -162,6 +164,7 @@ imageCommand
       width: options.width,
       height: options.height,
       count: options.count,
+      seed: options.seed,
       out: merged.outputDir,
       name: merged.outputName,
       provider: merged.provider,

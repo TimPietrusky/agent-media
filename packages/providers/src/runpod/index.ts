@@ -80,7 +80,7 @@ async function executeGenerate(
   context: ActionContext,
   apiKey: string
 ): Promise<MediaResult> {
-  const { prompt, width = 1024, height = 1024 } = options;
+  const { prompt, width = 1024, height = 1024, seed } = options;
 
   if (!prompt) {
     return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image generation');
@@ -92,6 +92,7 @@ async function executeGenerate(
     model: runpod.image('alibaba/wan-2.6'),
     prompt,
     size: `${width}x${height}`,
+    seed,
   });
 
   const outputFilename = resolveOutputFilename('png', 'generated', context.outputName);

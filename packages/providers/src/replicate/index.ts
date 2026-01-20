@@ -90,7 +90,7 @@ async function executeGenerate(
   context: ActionContext,
   apiToken: string
 ): Promise<MediaResult> {
-  const { prompt, width = 1024, height = 1024, model } = options;
+  const { prompt, width = 1024, height = 1024, model, seed } = options;
 
   if (!prompt) {
     return createError(ErrorCodes.INVALID_INPUT, 'Prompt is required for image generation');
@@ -103,6 +103,7 @@ async function executeGenerate(
     model: replicateClient.image(modelId),
     prompt,
     size: `${width}x${height}`,
+    seed,
   });
 
   const outputFilename = resolveOutputFilename('webp', 'generated', context.outputName);
