@@ -82,7 +82,7 @@ agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
 
 **Local processing** (no API key): resize, convert, extend, crop, audio extract, remove-background, transcribe
 
-**Cloud processing** (API key required): image generate, image edit, video generate
+**Cloud processing** (API key required): image generate, image edit, video generate, remove-background, transcribe
 
 > **Note**: You may see a `mutex lock failed` error when using local remove-background or transcribe — ignore it, the output is correct if JSON shows `"ok": true`.
 
@@ -214,7 +214,7 @@ agent-media image edit --in https://ytrzap04kkm0giml.public.blob.vercel-storage.
 
 ### remove-background
 
-*API key required*
+*local or cloud*
 
 ```bash
 agent-media image remove-background --in man-portrait.png
@@ -225,7 +225,7 @@ agent-media image remove-background --in https://ytrzap04kkm0giml.public.blob.ve
 |--------|-------------|
 | `--in <path>` | Input file path or URL (required) |
 | `--out <dir>` | Output directory |
-| `--provider <name>` | Provider (fal, replicate) |
+| `--provider <name>` | Provider (local, fal, replicate) |
 
 ---
 
@@ -304,9 +304,9 @@ agent-media audio extract --in https://ytrzap04kkm0giml.public.blob.vercel-stora
 
 ### transcribe
 
-*API key required*
+*local or cloud (diarization requires cloud)*
 
-Transcribe audio to text with timestamps. Supports speaker identification.
+Transcribe audio to text with timestamps. Speaker identification (diarization) requires a cloud provider.
 
 ```bash
 agent-media audio transcribe --in woman-greeting.mp3
@@ -317,11 +317,11 @@ agent-media audio transcribe --in https://ytrzap04kkm0giml.public.blob.vercel-st
 | Option | Description |
 |--------|-------------|
 | `--in <path>` | Input audio file path or URL (required) |
-| `--diarize` | Enable speaker identification |
+| `--diarize` | Enable speaker identification (cloud only) |
 | `--language <code>` | Language code (auto-detected if not provided) |
 | `--speakers <n>` | Number of speakers hint |
 | `--out <dir>` | Output directory |
-| `--provider <name>` | Provider (fal, replicate) |
+| `--provider <name>` | Provider (local, fal, replicate) |
 | `--model <name>` | Model override |
 
 ---
