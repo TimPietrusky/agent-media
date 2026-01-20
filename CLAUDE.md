@@ -224,15 +224,10 @@ git commit -m "feat|fix: descriptive message"
 ### 6. Push and create PR
 ```bash
 git push -u origin <branch-name>
-
-# Switch to YOUR_PRIMARY_ACCOUNT account for this repo (remote is github.com)
-gh auth switch --user YOUR_PRIMARY_ACCOUNT
-
 gh pr create --title "..." --body "..."
-
-# ALWAYS switch back to RunPod account when done
-gh auth switch --user YOUR_SECONDARY_ACCOUNT
 ```
+
+> **Note:** If you need to switch GitHub accounts for PR creation, store your account switching commands in `.claude.local/workflow.md` (gitignored).
 
 ### Important
 - **NEVER** manually edit CHANGELOG.md - changesets auto-generates it

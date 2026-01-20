@@ -66,15 +66,10 @@ git commit -m "feat|fix: descriptive message"
 
 ```bash
 git push -u origin <branch-name>
-
-# Switch to YOUR_PRIMARY_ACCOUNT account for this repo
-gh auth switch --user YOUR_PRIMARY_ACCOUNT
-
 gh pr create --title "..." --body "..."
-
-# Switch back to RunPod account when done
-gh auth switch --user YOUR_SECONDARY_ACCOUNT
 ```
+
+> **Note:** If you need to switch GitHub accounts for PR creation, check `.claude.local/workflow.md` for your personal account switching commands.
 
 ## Important reminders
 
