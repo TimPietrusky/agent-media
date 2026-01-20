@@ -6,6 +6,7 @@ export {
   generate,
   extend,
   edit,
+  crop,
 } from './actions/index.js';
 
 // Export action input types
@@ -16,6 +17,7 @@ export type {
   GenerateInput,
   ExtendInput,
   EditInput,
+  CropInput,
 } from './actions/index.js';
 
 // Re-export core types for convenience

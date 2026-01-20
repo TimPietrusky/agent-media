@@ -36,7 +36,7 @@ This is a **pnpm monorepo** with six packages:
 packages/
 ├── agent-media/  # Commander.js CLI entry point (bin: agent-media)
 ├── core/         # Shared types, provider registry, result builders, config
-├── image/        # Image action implementations (resize, convert, generate, remove-background, extend, edit)
+├── image/        # Image action implementations (resize, convert, generate, remove-background, extend, edit, crop)
 ├── audio/        # Audio action implementations (extract, transcribe)
 ├── video/        # Reserved for future video-specific actions
 └── providers/    # Provider implementations (local, fal.ai, replicate, runpod, ai-gateway)
@@ -61,7 +61,7 @@ skills/           # SKILL.md definitions for AI agent discovery (npx skills add 
 - Error codes defined in `packages/core/src/types/index.ts`
 
 **Local Provider**: Zero-config operations without external APIs. Uses:
-- [Sharp](https://sharp.pixelplumbing.com/) for image processing (resize, convert, extend)
+- [Sharp](https://sharp.pixelplumbing.com/) for image processing (resize, convert, extend, crop)
 - [Transformers.js](https://huggingface.co/docs/transformers.js) for ML inference (remove-background with Xenova/modnet, transcribe with Moonshine)
 
 **Cloud Providers (Fal, Replicate, Runpod, AI Gateway)**: All cloud providers use AI SDK as the primary interface. See "AI SDK Usage Pattern" below.

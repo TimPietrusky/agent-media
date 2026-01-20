@@ -2,7 +2,7 @@
 
 Media processing CLI for AI agents.
 
-- **Image**: generate, edit, remove-background, resize, convert, extend
+- **Image**: generate, edit, remove-background, resize, convert, extend, crop
 - **Video**: generate (text-to-video and image-to-video)
 - **Audio**: extract from video, transcribe (with speaker identification)
 
@@ -45,6 +45,7 @@ This adds media processing skills that your AI agent can use automatically. Avai
 - `image-resize` - Resize images
 - `image-convert` - Convert image formats
 - `image-remove-background` - Remove backgrounds
+- `image-crop` - Crop images to specified dimensions
 - `audio-extract` - Extract audio from video
 - `audio-transcribe` - Transcribe audio to text
 - `video-generate` - Generate videos from text or images
@@ -79,7 +80,7 @@ agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
 - Node.js >= 18.0.0
 - API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), [Runpod](https://www.runpod.io/console/user/settings), or [AI Gateway](https://vercel.com/ai-gateway) for AI features
 
-**Local processing** (no API key): resize, convert, extend, audio extract, remove-background, transcribe
+**Local processing** (no API key): resize, convert, extend, crop, audio extract, remove-background, transcribe
 
 **Cloud processing** (API key required): image generate, image edit, video generate
 
@@ -93,6 +94,7 @@ agent-media audio transcribe --in .agent-media/*_extracted_*.mp3
 agent-media image resize --in <path> [options]
 agent-media image convert --in <path> --format <f>
 agent-media image extend --in <path> --padding <px> --color <hex>
+agent-media image crop --in <path> --width <px> --height <px>
 agent-media image generate --prompt <text>
 agent-media image edit --in <path> --prompt <text>
 agent-media image remove-background --in <path>
@@ -148,6 +150,28 @@ agent-media image extend --in https://ytrzap04kkm0giml.public.blob.vercel-storag
 | `--in <path>` | Input file path or URL (required) |
 | `--padding <px>` | Padding size in pixels to add on all sides (required) |
 | `--color <hex>` | Background color for extended area (required). Also flattens transparency. |
+| `--dpi <n>` | DPI/density for output image (default: 300) |
+| `--out <dir>` | Output directory |
+
+### crop
+
+*local*
+
+Crop an image to specified dimensions around a focal point. The crop region is calculated to center on the focal point while staying within image bounds.
+
+```bash
+agent-media image crop --in sunset-mountains.jpg --width 800 --height 600
+agent-media image crop --in sunset-mountains.jpg --width 800 --height 600 --focus-x 20 --focus-y 30
+agent-media image crop --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.jpg --width 400 --height 400
+```
+
+| Option | Description |
+|--------|-------------|
+| `--in <path>` | Input file path or URL (required) |
+| `--width <px>` | Width of crop area in pixels (required) |
+| `--height <px>` | Height of crop area in pixels (required) |
+| `--focus-x <n>` | Focal point X position 0-100 (default: 50 = center) |
+| `--focus-y <n>` | Focal point Y position 0-100 (default: 50 = center) |
 | `--dpi <n>` | DPI/density for output image (default: 300) |
 | `--out <dir>` | Output directory |
 
@@ -336,13 +360,13 @@ Exit code is `0` on success, `1` on error.
 
 ### Default Models
 
-| Provider | resize | convert | extend | image generate | image edit | remove-background | video generate | transcribe |
-|----------|--------|---------|--------|----------------|------------|-------------------|----------------|------------|
-| **local** | ✓* | ✓* | ✓* | - | - | `Xenova/modnet`** | - | `moonshine-base`** |
-| **fal** | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/ltx-2` | `fal-ai/wizper` |
-| **replicate** | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | `whisper-diarization` |
-| **runpod** | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | - |
-| **ai-gateway** | - | - | - | `bfl/flux-2-pro` | `google/gemini-3-pro-image` | - | - | - |
+| Provider | resize | convert | extend | crop | image generate | image edit | remove-background | video generate | transcribe |
+|----------|--------|---------|--------|------|----------------|------------|-------------------|----------------|------------|
+| **local** | ✓* | ✓* | ✓* | ✓* | - | - | `Xenova/modnet`** | - | `moonshine-base`** |
+| **fal** | - | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/ltx-2` | `fal-ai/wizper` |
+| **replicate** | - | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | `whisper-diarization` |
+| **runpod** | - | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | - |
+| **ai-gateway** | - | - | - | - | `bfl/flux-2-pro` | `google/gemini-3-pro-image` | - | - | - |
 
 \* Powered by [Sharp](https://sharp.pixelplumbing.com/) for fast image processing
 \** Powered by [Transformers.js](https://huggingface.co/docs/transformers.js) for local ML inference (models downloaded on first use)

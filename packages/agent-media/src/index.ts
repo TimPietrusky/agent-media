@@ -3,7 +3,7 @@
 import 'dotenv/config';
 import { Command } from 'commander';
 import { registerAllProviders } from '@agent-media/providers';
-import { resize, convert, removeBackground, generate, extend, edit, printResult } from '@agent-media/image';
+import { resize, convert, removeBackground, generate, extend, edit, crop, printResult } from '@agent-media/image';
 import { extract, transcribe } from '@agent-media/audio';
 import { generate as videoGenerate } from '@agent-media/video';
 import type { ImageFormat, AudioFormat, VideoResolution, VideoFps } from '@agent-media/core';
@@ -240,6 +240,49 @@ imageCommand
       name: merged.outputName,
       provider: merged.provider,
       model: options.model,
+    });
+
+    printResult(result);
+    process.exit(result.ok ? 0 : 1);
+  });
+
+// Image crop command
+imageCommand
+  .command('crop')
+  .description('Crop an image to specified dimensions around a focal point')
+  .requiredOption('--in <path>', 'Input file path or URL')
+  .requiredOption('--width <pixels>', 'Width of crop area in pixels', parseInt)
+  .requiredOption('--height <pixels>', 'Height of crop area in pixels', parseInt)
+  .option('--focus-x <percent>', 'Focal point X position 0-100 (default: 50)', parseInt)
+  .option('--focus-y <percent>', 'Focal point Y position 0-100 (default: 50)', parseInt)
+  .option('--dpi <number>', 'DPI/density for output (default: 300)', parseInt)
+  .option('--out <path>', 'Output directory')
+  .option('--name <filename>', 'Output filename (extension auto-added if missing)')
+  .option('--provider <name>', 'Provider to use (local)')
+  .action(async (options: {
+    in: string;
+    width: number;
+    height: number;
+    focusX?: number;
+    focusY?: number;
+    dpi?: number;
+    out?: string;
+    name?: string;
+    provider?: string;
+  }) => {
+    const config = getConfig();
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider, name: options.name });
+
+    const result = await crop({
+      input: options.in,
+      width: options.width,
+      height: options.height,
+      focusX: options.focusX,
+      focusY: options.focusY,
+      dpi: options.dpi,
+      out: merged.outputDir,
+      name: merged.outputName,
+      provider: merged.provider,
     });
 
     printResult(result);
