@@ -1,5 +1,11 @@
 # agent-media
 
+## 0.10.1
+
+### Patch Changes
+
+- 4bf1fbf: Add missing skills for image-edit and image-extend actions
+
 ## 0.10.0
 
 ### Minor Changes
