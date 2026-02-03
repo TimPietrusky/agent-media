@@ -1,5 +1,5 @@
 import { createRunpod } from '@runpod/ai-sdk-provider';
-import { generateImage } from 'ai';
+import { generateImage, experimental_transcribe as transcribe } from 'ai';
 import { writeFile, readFile, stat } from 'node:fs/promises';
 import type {
   MediaProvider,
@@ -9,10 +9,13 @@ import type {
   GenerateOptions,
   EditOptions,
   VideoGenerateOptions,
+  TranscribeOptions,
+  TranscriptionData,
 } from '@agent-media/core';
 import {
   createSuccess,
   createError,
+  createTranscriptionSuccess,
   ensureOutputDir,
   resolveOutputFilename,
   getOutputPath,
@@ -23,15 +26,16 @@ import { generateVideoRunpod } from '../video-gen/runpod.js';
 /**
  * Actions supported by the runpod provider
  */
-const SUPPORTED_ACTIONS = ['generate', 'edit', 'video-generate'];
+const SUPPORTED_ACTIONS = ['generate', 'edit', 'video-generate', 'transcribe'];
 
 /**
- * Runpod provider for image generation and editing
+ * Runpod provider for image generation, editing, and transcription
  * Requires RUNPOD_API_KEY environment variable
  *
  * Supported actions:
  * - generate: Text-to-image using alibaba/wan-2.6
  * - edit: Image-to-image editing using google/nano-banana-pro-edit
+ * - transcribe: Audio-to-text using pruna/whisper-v3-large (no diarization support)
  */
 export const runpodProvider: MediaProvider = {
   name: 'runpod',
@@ -63,6 +67,8 @@ export const runpodProvider: MediaProvider = {
           return await executeEdit(actionConfig.options, context, apiKey);
         case 'video-generate':
           return await executeVideoGenerate(actionConfig.options, context, apiKey);
+        case 'transcribe':
+          return await executeTranscribe(actionConfig.options, context, apiKey);
         default:
           return createError(
             ErrorCodes.INVALID_INPUT,
@@ -231,6 +237,77 @@ async function executeVideoGenerate(
     const message = error instanceof Error ? error.message : String(error);
     return createError(ErrorCodes.PROVIDER_ERROR, message);
   }
+}
+
+/**
+ * Execute transcribe action using Runpod pruna/whisper-v3-large model via AI SDK
+ * Note: RunPod's Whisper model does NOT support diarization (speaker identification)
+ */
+async function executeTranscribe(
+  options: TranscribeOptions,
+  context: ActionContext,
+  apiKey: string
+): Promise<MediaResult> {
+  const { input, diarize = false, language } = options;
+
+  if (!input?.source) {
+    return createError(ErrorCodes.INVALID_INPUT, 'Input source is required for transcription');
+  }
+
+  // Warn if diarization is requested - RunPod doesn't support it
+  if (diarize) {
+    console.warn('Warning: RunPod provider does not support diarization (speaker identification). Use fal or replicate for diarization.');
+  }
+
+  const runpod = createRunpod({ apiKey });
+
+  // Prepare audio input - AI SDK accepts Buffer, Uint8Array, or URL
+  let audioInput: Buffer | string;
+  if (input.isUrl) {
+    audioInput = input.source;
+  } else {
+    audioInput = await readFile(input.source);
+  }
+
+  // Build provider options for runpod
+  const providerOptions: Record<string, unknown> = {};
+
+  if (language) {
+    providerOptions['language'] = language;
+  }
+
+  // Call transcription via AI SDK
+  const result = await transcribe({
+    model: runpod.transcription('pruna/whisper-v3-large'),
+    audio: audioInput,
+    providerOptions: Object.keys(providerOptions).length > 0
+      ? { runpod: providerOptions as Record<string, string | number | boolean> }
+      : undefined,
+  });
+
+  // Transform to our TranscriptionData format
+  const transcription: TranscriptionData = {
+    text: result.text || '',
+    language: result.language || language || 'unknown',
+    segments: (result.segments || []).map(segment => ({
+      start: segment.startSecond,
+      end: segment.endSecond,
+      text: segment.text,
+    })),
+  };
+
+  // Save transcription to JSON file
+  const outputFilename = resolveOutputFilename('json', 'transcription', context.outputName, context.inputSource);
+  const outputPath = getOutputPath(context.outputDir, outputFilename);
+
+  await writeFile(outputPath, JSON.stringify(transcription, null, 2));
+
+  return createTranscriptionSuccess({
+    mediaType: 'audio',
+    provider: 'runpod',
+    outputPath: outputPath,
+    transcription,
+  });
 }
 
 export default runpodProvider;

@@ -55,7 +55,7 @@
     "@huggingface/transformers": "^3.3.3",
     "@ai-sdk/replicate": "^2.0.6",
     "@fal-ai/client": "^1.8.3",
-    "@runpod/ai-sdk-provider": "^1.1.0",
+    "@runpod/ai-sdk-provider": "^1.2.0",
     "ai": "^6.0.33",
     "replicate": "^1.1.1",
     "sharp": "^0.34.1"

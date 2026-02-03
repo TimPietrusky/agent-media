@@ -22,7 +22,7 @@ agent-media audio transcribe --in <path> [options]
 | `--language` | No | Language code (auto-detected if not provided) |
 | `--speakers` | No | Number of speakers hint for diarization |
 | `--out` | No | Output path, filename or directory (default: ./) |
-| `--provider` | No | Provider to use (local, fal, replicate) |
+| `--provider` | No | Provider to use (local, fal, replicate, runpod) |
 
 ## Output
 
@@ -106,3 +106,13 @@ agent-media audio transcribe --in audio.mp3 --provider local
 - Requires `REPLICATE_API_TOKEN`
 - Uses `whisper-diarization` model with Whisper Large V3 Turbo
 - Native diarization support with word-level timestamps
+
+### runpod
+
+- Requires `RUNPOD_API_KEY`
+- Uses `pruna/whisper-v3-large` model (Whisper Large V3)
+- Does NOT support diarization (speaker identification) - use fal or replicate for diarization
+
+```bash
+agent-media audio transcribe --in audio.mp3 --provider runpod
+```

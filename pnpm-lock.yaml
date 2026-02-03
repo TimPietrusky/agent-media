@@ -111,8 +111,8 @@ importers:
         specifier: ^3.3.3
         version: 3.8.1
       '@runpod/ai-sdk-provider':
-        specifier: ^1.1.0
-        version: 1.1.0(zod@4.3.5)
+        specifier: ^1.2.0
+        version: 1.2.0(zod@4.3.5)
       ai:
         specifier: ^6.0.33
         version: 6.0.33(zod@4.3.5)
@@ -759,8 +759,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@runpod/ai-sdk-provider@1.1.0':
-    resolution: {integrity: sha512-xYn/4/kZIjIQz74ELregVqv2go70DHfyKmmO1sOoz8CKyqZKJ8s7Dj7e423/7CYzDfCIMp4p3osOHPDQu5MAug==}
+  '@runpod/ai-sdk-provider@1.2.0':
+    resolution: {integrity: sha512-Q89h7UzOusN2Qt5fxP0redZjjN0YtDxdEnPMnjJWK3ygkwBi4Vsqc6HEaqhXwX6tV9PoGQDCOuUCmN/HUS/VjQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4
@@ -2088,11 +2088,11 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.55.2':
     optional: true
 
-  '@runpod/ai-sdk-provider@1.1.0(zod@4.3.5)':
+  '@runpod/ai-sdk-provider@1.2.0(zod@4.3.5)':
     dependencies:
       '@ai-sdk/openai-compatible': 2.0.10(zod@4.3.5)
-      '@ai-sdk/provider': 3.0.2
-      '@ai-sdk/provider-utils': 4.0.5(zod@4.3.5)
+      '@ai-sdk/provider': 3.0.3
+      '@ai-sdk/provider-utils': 4.0.6(zod@4.3.5)
       zod: 4.3.5
 
   '@standard-schema/spec@1.1.0': {}
