@@ -1,6 +1,6 @@
 {
   "name": "@agent-media/providers",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Media providers for agent-media toolkit",
   "license": "Apache-2.0",
   "repository": {

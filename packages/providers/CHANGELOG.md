@@ -1,5 +1,15 @@
 # @agent-media/providers
 
+## 0.9.0
+
+### Minor Changes
+
+- 268f212: feat: add transcription support to RunPod provider
+
+  - Upgrade @runpod/ai-sdk-provider to v1.2.0
+  - Add transcribe action using pruna/whisper-v3-large model
+  - Note: RunPod does not support diarization (speaker identification)
+
 ## 0.8.1
 
 ### Patch Changes
