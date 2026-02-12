@@ -265,7 +265,6 @@ gh pr create --title "..." --body "..."
 > **Note:** If you need to switch GitHub accounts for PR creation, store your account switching commands in `.claude.local/workflow.md` (gitignored).
 
 ### Important
-- **NEVER** add `Co-Authored-By` lines to commits. Commits are authored solely by the user.
 - **NEVER** manually edit CHANGELOG.md - changesets auto-generates it
 - **NEVER** run `pnpm changeset version` locally
 - Always include the changeset file with your commit
