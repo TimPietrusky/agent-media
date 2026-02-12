@@ -149,19 +149,54 @@ const result = await transcribe({
 
 ### Adding a New Image Action
 
-1. Add action type to `ImageAction` in `packages/core/src/types/index.ts`
-2. Create action function in `packages/image/src/actions/<action>.ts`
-3. Export from `packages/image/src/actions/index.ts`
-4. Add CLI command in `packages/agent-media/src/index.ts`
-5. Create skill definition in `skills/<action-name>/SKILL.md`
+**IMPORTANT: Every new action touches many files. Do NOT skip any step. Use this as a checklist.**
+
+#### Code changes:
+1. **Core types** — `packages/core/src/types/index.ts`: Add to `ImageAction` union, create `<Action>Options` interface, add to `ActionOptions` union
+2. **Core exports** — `packages/core/src/index.ts`: Export the new `<Action>Options` type
+3. **Provider implementation** — For each provider that supports the action:
+   - `packages/providers/src/<provider>/index.ts`: Add to `SUPPORTED_ACTIONS`, import options type, add case in switch, implement `execute<Action>` function
+   - For local provider with ML: create `packages/providers/src/transformers/<action>.ts`, register in `packages/providers/src/transformers/index.ts`, delegate from `packages/providers/src/local/index.ts`
+4. **Action function** — `packages/image/src/actions/<action>.ts`: Create action with input interface and function
+5. **Action exports** — `packages/image/src/actions/index.ts`: Export action function and input type
+6. **Package exports** — `packages/image/src/index.ts`: Export action function and input type
+7. **CLI command** — `packages/agent-media/src/index.ts`: Import action, add `imageCommand.command('<action>')` with options
+
+#### Documentation & skills (DO NOT SKIP):
+8. **Action skill** — `skills/image-<action>/SKILL.md`: Create skill definition (follow existing pattern)
+9. **Main skill** — `skills/agent-media/SKILL.md`: Add command to Image Commands list, update provider capabilities
+10. **README** — `README.md`: Update feature list, add command to image summary, add action section with examples and options table, update provider table, update local/cloud processing lists
+11. **README sync** — `cp README.md packages/agent-media/README.md` (npm uses this copy)
+12. **CLAUDE.md** — Update provider capability table, update Action Layer description, update Local Provider description if applicable
+
+#### Verification:
+13. `pnpm build` — Must pass
+14. `pnpm typecheck` — Must pass
+15. Test with at least one provider
 
 ### Adding a New Audio Action
 
-1. Add action type to `AudioAction` in `packages/core/src/types/index.ts`
-2. Create action function in `packages/audio/src/actions/<action>.ts`
-3. Export from `packages/audio/src/actions/index.ts`
-4. Add CLI command in `packages/agent-media/src/index.ts`
-5. Create skill definition in `skills/<action-name>/SKILL.md`
+**IMPORTANT: Every new action touches many files. Do NOT skip any step. Use this as a checklist.**
+
+#### Code changes:
+1. **Core types** — `packages/core/src/types/index.ts`: Add to `AudioAction` union, create `<Action>Options` interface, add to `ActionOptions` union
+2. **Core exports** — `packages/core/src/index.ts`: Export the new `<Action>Options` type
+3. **Provider implementation** — For each provider that supports the action (same pattern as image)
+4. **Action function** — `packages/audio/src/actions/<action>.ts`
+5. **Action exports** — `packages/audio/src/actions/index.ts`
+6. **Package exports** — `packages/audio/src/index.ts`
+7. **CLI command** — `packages/agent-media/src/index.ts`
+
+#### Documentation & skills (DO NOT SKIP):
+8. **Action skill** — `skills/audio-<action>/SKILL.md`
+9. **Main skill** — `skills/agent-media/SKILL.md`: Add command to Audio Commands list, update provider capabilities
+10. **README** — `README.md`: Update feature list, add section, update provider table
+11. **README sync** — `cp README.md packages/agent-media/README.md`
+12. **CLAUDE.md** — Update provider capability table and descriptions
+
+#### Verification:
+13. `pnpm build` and `pnpm typecheck` — Must pass
+14. Test with at least one provider
 
 ## Environment Variables
 
