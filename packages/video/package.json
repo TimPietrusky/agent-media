@@ -1,6 +1,6 @@
 {
   "name": "@agent-media/video",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Video actions for agent-media toolkit",
   "license": "Apache-2.0",
   "repository": {

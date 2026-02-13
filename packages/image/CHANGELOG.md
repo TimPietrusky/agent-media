@@ -1,5 +1,17 @@
 # @agent-media/image
 
+## 0.7.0
+
+### Minor Changes
+
+- d61796e: Add image upscale action with AI super-resolution support for local (Swin2SR), fal (ESRGAN), and replicate (Real-ESRGAN) providers
+
+### Patch Changes
+
+- Updated dependencies [d61796e]
+  - @agent-media/core@0.10.0
+  - @agent-media/providers@0.10.0
+
 ## 0.6.1
 
 ### Patch Changes
