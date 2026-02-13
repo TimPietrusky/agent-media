@@ -11,6 +11,7 @@ import type {
   TranscribeOptions,
   TranscriptionData,
   EditOptions,
+  UpscaleOptions,
   VideoGenerateOptions,
 } from '@agent-media/core';
 import {
@@ -27,7 +28,7 @@ import { generateVideoFal } from '../video-gen/index.js';
 /**
  * Actions supported by the fal provider
  */
-const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe', 'edit', 'video-generate'];
+const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe', 'edit', 'upscale', 'video-generate'];
 
 /**
  * Fal.ai provider for image generation and processing
@@ -65,6 +66,8 @@ export const falProvider: MediaProvider = {
           return await executeTranscribe(actionConfig.options, context, apiKey);
         case 'edit':
           return await executeEdit(actionConfig.options, context, apiKey);
+        case 'upscale':
+          return await executeUpscale(actionConfig.options, context, apiKey);
         case 'video-generate':
           return await executeVideoGenerate(actionConfig.options, context, apiKey);
         default:
@@ -249,6 +252,67 @@ async function executeRemoveBackground(
   return createSuccess({
     mediaType: 'image',
     action: 'remove-background',
+    provider: 'fal',
+    outputPath: outputPath,
+    mime: 'image/png',
+    bytes: stats.size,
+  });
+}
+
+/**
+ * Execute upscale action using fal.ai ESRGAN model via AI SDK
+ * Default model: fal-ai/esrgan
+ */
+async function executeUpscale(
+  options: UpscaleOptions,
+  context: ActionContext,
+  apiKey: string
+): Promise<MediaResult> {
+  const { input, scale = 2, model } = options;
+
+  if (!input?.source) {
+    return createError(ErrorCodes.INVALID_INPUT, 'Input source is required for upscaling');
+  }
+
+  const falClient = createFal({ apiKey });
+  const modelId = model || 'fal-ai/esrgan';
+
+  // Prepare the image input
+  let imageBuffer: Buffer;
+  if (input.isUrl) {
+    const response = await fetch(input.source);
+    if (!response.ok) {
+      return createError(ErrorCodes.NETWORK_ERROR, `Failed to fetch input image: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    imageBuffer = Buffer.from(arrayBuffer);
+  } else {
+    imageBuffer = await readFile(input.source);
+  }
+
+  const { image } = await generateImage({
+    model: falClient.image(modelId),
+    prompt: {
+      text: '',
+      images: [imageBuffer],
+    },
+    providerOptions: {
+      fal: {
+        scale,
+      },
+    },
+  });
+
+  const outputFilename = resolveOutputFilename('png', 'upscaled', context.outputName, context.inputSource);
+  const outputPath = getOutputPath(context.outputDir, outputFilename);
+
+  await writeFile(outputPath, image.uint8Array);
+
+  const stats = await stat(outputPath);
+
+  return createSuccess({
+    mediaType: 'image',
+    action: 'upscale',
     provider: 'fal',
     outputPath: outputPath,
     mime: 'image/png',

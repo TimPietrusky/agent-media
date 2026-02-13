@@ -3,7 +3,7 @@
 import 'dotenv/config';
 import { Command } from 'commander';
 import { registerAllProviders } from '@agent-media/providers';
-import { resize, convert, removeBackground, generate, extend, edit, crop, printResult } from '@agent-media/image';
+import { resize, convert, removeBackground, generate, extend, edit, crop, upscale, printResult } from '@agent-media/image';
 import { extract, transcribe } from '@agent-media/audio';
 import { generate as videoGenerate } from '@agent-media/video';
 import type { ImageFormat, AudioFormat, VideoResolution, VideoFps } from '@agent-media/core';
@@ -269,6 +269,38 @@ imageCommand
       out: merged.outputDir,
       name: merged.outputName,
       provider: merged.provider,
+    });
+
+    printResult(result);
+    process.exit(result.ok ? 0 : 1);
+  });
+
+// Image upscale command
+imageCommand
+  .command('upscale')
+  .description('Upscale an image using AI super-resolution')
+  .requiredOption('--in <path>', 'Input file path or URL')
+  .option('--scale <factor>', 'Scale factor (e.g., 2 or 4, default: 2)', parseInt)
+  .option('--out <path>', 'Output path, filename or directory (default: ./)')
+  .option('--provider <name>', 'Provider to use (local, fal, replicate)')
+  .option('--model <name>', 'Model to use (overrides provider default)')
+  .action(async (options: {
+    in: string;
+    scale?: number;
+    out?: string;
+    provider?: string;
+    model?: string;
+  }) => {
+    const config = getConfig();
+    const merged = mergeConfig(config, { out: options.out, provider: options.provider });
+
+    const result = await upscale({
+      input: options.in,
+      scale: options.scale,
+      out: merged.outputDir,
+      name: merged.outputName,
+      provider: merged.provider,
+      model: options.model,
     });
 
     printResult(result);

@@ -18,3 +18,6 @@ export type { EditInput } from './edit.js';
 
 export { crop } from './crop.js';
 export type { CropInput } from './crop.js';
+
+export { upscale } from './upscale.js';
+export type { UpscaleInput } from './upscale.js';

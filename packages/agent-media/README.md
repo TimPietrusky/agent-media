@@ -2,7 +2,7 @@
 
 Media processing CLI for AI agents.
 
-- **Image**: generate, edit, remove-background, resize, convert, extend, crop
+- **Image**: generate, edit, remove-background, upscale, resize, convert, extend, crop
 - **Video**: generate (text-to-video and image-to-video)
 - **Audio**: extract from video, transcribe (with speaker identification)
 
@@ -48,6 +48,7 @@ This adds media processing skills that your AI agent can use automatically. Avai
 - `image-extend` - Extend image canvas with padding
 - `image-remove-background` - Remove backgrounds
 - `image-crop` - Crop images to specified dimensions
+- `image-upscale` - Upscale images with AI super-resolution
 - `audio-extract` - Extract audio from video
 - `audio-transcribe` - Transcribe audio to text
 - `video-generate` - Generate videos from text or images
@@ -79,11 +80,11 @@ agent-media audio transcribe --in rob_cat_audio.mp3
 - Node.js >= 18.0.0
 - API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), [Runpod](https://www.runpod.io/console/user/settings), or [AI Gateway](https://vercel.com/ai-gateway) for AI features
 
-**Local processing** (no API key): resize, convert, extend, crop, audio extract, remove-background, transcribe
+**Local processing** (no API key): resize, convert, extend, crop, upscale, audio extract, remove-background, transcribe
 
-**Cloud processing** (API key required): image generate, image edit, video generate, remove-background, transcribe
+**Cloud processing** (API key required): image generate, image edit, upscale, video generate, remove-background, transcribe
 
-> **Note**: You may see a `mutex lock failed` error when using local remove-background or transcribe — ignore it, the output is correct if JSON shows `"ok": true`.
+> **Note**: You may see a `mutex lock failed` error when using local remove-background, upscale, or transcribe — ignore it, the output is correct if JSON shows `"ok": true`.
 
 ---
 
@@ -97,6 +98,7 @@ agent-media image crop --in <path> --width <px> --height <px>
 agent-media image generate --prompt <text>
 agent-media image edit --in <path> --prompt <text>
 agent-media image remove-background --in <path>
+agent-media image upscale --in <path>
 ```
 
 ### resize
@@ -225,6 +227,26 @@ agent-media image remove-background --in https://ytrzap04kkm0giml.public.blob.ve
 | `--in <path>` | Input file path or URL (required) |
 | `--out <path>` | Output path, filename or directory (default: ./) |
 | `--provider <name>` | Provider (local, fal, replicate) |
+
+### upscale
+
+*local or cloud*
+
+Upscale an image using AI super-resolution to increase resolution with detail generation.
+
+```bash
+agent-media image upscale --in sunset-mountains.jpg
+agent-media image upscale --in sunset-mountains.jpg --scale 4 --provider fal
+agent-media image upscale --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.jpg --provider replicate
+```
+
+| Option | Description |
+|--------|-------------|
+| `--in <path>` | Input file path or URL (required) |
+| `--scale <n>` | Scale factor: 2 or 4 (default: 2). Local provider always outputs 4x. |
+| `--out <path>` | Output path, filename or directory (default: ./) |
+| `--provider <name>` | Provider (local, fal, replicate) |
+| `--model <name>` | Model override |
 
 ---
 
@@ -361,13 +383,13 @@ Exit code is `0` on success, `1` on error.
 
 ### Default Models
 
-| Provider | resize | convert | extend | crop | image generate | image edit | remove-background | video generate | transcribe |
-|----------|--------|---------|--------|------|----------------|------------|-------------------|----------------|------------|
-| **local** | ✓* | ✓* | ✓* | ✓* | - | - | `Xenova/modnet`** | - | `moonshine-base`** |
-| **fal** | - | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/ltx-2` | `fal-ai/wizper` |
-| **replicate** | - | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `lightricks/ltx-video` | `whisper-diarization` |
-| **runpod** | - | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | `wan-2.6` | - |
-| **ai-gateway** | - | - | - | - | `bfl/flux-2-pro` | `google/gemini-3-pro-image` | - | - | - |
+| Provider | resize | convert | extend | crop | image generate | image edit | remove-background | upscale | video generate | transcribe |
+|----------|--------|---------|--------|------|----------------|------------|-------------------|---------|----------------|------------|
+| **local** | ✓* | ✓* | ✓* | ✓* | - | - | `Xenova/modnet`** | `Xenova/swin2SR`** | - | `moonshine-base`** |
+| **fal** | - | - | - | - | `fal-ai/flux-2` | `fal-ai/flux-2/edit` | `fal-ai/birefnet/v2` | `fal-ai/esrgan` | `fal-ai/ltx-2` | `fal-ai/wizper` |
+| **replicate** | - | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `nightmareai/real-esrgan` | `lightricks/ltx-video` | `whisper-diarization` |
+| **runpod** | - | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | `wan-2.6` | - |
+| **ai-gateway** | - | - | - | - | `bfl/flux-2-pro` | `google/gemini-3-pro-image` | - | - | - | - |
 
 \* Powered by [Sharp](https://sharp.pixelplumbing.com/) for fast image processing
 \** Powered by [Transformers.js](https://huggingface.co/docs/transformers.js) for local ML inference (models downloaded on first use)

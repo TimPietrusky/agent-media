@@ -7,6 +7,7 @@ import type {
 import { createError, ensureOutputDir, ErrorCodes } from '@agent-media/core';
 import { executeBackgroundRemoval } from './background-removal.js';
 import { executeTranscribe } from './transcribe.js';
+import { executeUpscale } from './upscale.js';
 
 /**
  * Note: ONNX runtime on macOS may cause a mutex error during cleanup.
@@ -17,7 +18,7 @@ import { executeTranscribe } from './transcribe.js';
 /**
  * Actions supported by the transformers provider
  */
-const SUPPORTED_ACTIONS = ['remove-background', 'transcribe'];
+const SUPPORTED_ACTIONS = ['remove-background', 'transcribe', 'upscale'];
 
 /**
  * Transformers.js provider for local ML inference
@@ -26,6 +27,7 @@ const SUPPORTED_ACTIONS = ['remove-background', 'transcribe'];
  * Supports:
  * - remove-background: Xenova/modnet (default), briaai/RMBG-2.0 (requires HF auth)
  * - transcribe: Moonshine (default, 5x faster than Whisper), Whisper, Distil-Whisper
+ * - upscale: Xenova/swin2SR-compressed-sr-x4-48 (default, ~1.3MB, always 4x)
  *
  * Models are downloaded on first use and cached locally (~/.cache/huggingface/).
  * No API keys required.
@@ -51,6 +53,9 @@ export const transformersProvider: MediaProvider = {
           break;
         case 'transcribe':
           result = await executeTranscribe(actionConfig.options, context);
+          break;
+        case 'upscale':
+          result = await executeUpscale(actionConfig.options, context);
           break;
         default:
           return createError(

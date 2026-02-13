@@ -7,6 +7,7 @@ export {
   extend,
   edit,
   crop,
+  upscale,
 } from './actions/index.js';
 
 // Export action input types
@@ -18,6 +19,7 @@ export type {
   ExtendInput,
   EditInput,
   CropInput,
+  UpscaleInput,
 } from './actions/index.js';
 
 // Re-export core types for convenience

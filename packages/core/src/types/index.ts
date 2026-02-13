@@ -6,7 +6,7 @@ export type MediaType = 'image' | 'video' | 'audio';
 /**
  * Supported image actions
  */
-export type ImageAction = 'resize' | 'convert' | 'remove-background' | 'generate' | 'extend' | 'edit' | 'crop';
+export type ImageAction = 'resize' | 'convert' | 'remove-background' | 'generate' | 'extend' | 'edit' | 'crop' | 'upscale';
 
 /**
  * Supported audio actions
@@ -140,6 +140,17 @@ export interface CropOptions {
 }
 
 /**
+ * Options for upscale action
+ */
+export interface UpscaleOptions {
+  input: MediaInput;
+  /** Scale factor (e.g., 2 or 4, default: 2) */
+  scale?: number;
+  /** Override default model */
+  model?: string;
+}
+
+/**
  * A segment of transcribed text with timing information
  */
 export interface TranscriptionSegment {
@@ -223,6 +234,7 @@ export type ActionOptions =
   | { action: 'extend'; options: ExtendOptions }
   | { action: 'edit'; options: EditOptions }
   | { action: 'crop'; options: CropOptions }
+  | { action: 'upscale'; options: UpscaleOptions }
   | { action: 'extract'; options: ExtractOptions }
   | { action: 'transcribe'; options: TranscribeOptions }
   | { action: 'video-generate'; options: VideoGenerateOptions };

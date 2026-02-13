@@ -12,6 +12,7 @@ import type {
   TranscribeOptions,
   TranscriptionData,
   EditOptions,
+  UpscaleOptions,
   VideoGenerateOptions,
 } from '@agent-media/core';
 import {
@@ -28,7 +29,7 @@ import { generateVideoReplicate } from '../video-gen/index.js';
 /**
  * Actions supported by the replicate provider
  */
-const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe', 'edit', 'video-generate'];
+const SUPPORTED_ACTIONS = ['generate', 'remove-background', 'transcribe', 'edit', 'upscale', 'video-generate'];
 
 /**
  * Replicate provider for image generation and processing
@@ -66,6 +67,8 @@ export const replicateProvider: MediaProvider = {
           return await executeTranscribe(actionConfig.options, context, apiToken);
         case 'edit':
           return await executeEdit(actionConfig.options, context, apiToken);
+        case 'upscale':
+          return await executeUpscale(actionConfig.options, context, apiToken);
         case 'video-generate':
           return await executeVideoGenerate(actionConfig.options, context, apiToken);
         default:
@@ -242,6 +245,67 @@ async function executeRemoveBackground(
   return createSuccess({
     mediaType: 'image',
     action: 'remove-background',
+    provider: 'replicate',
+    outputPath: outputPath,
+    mime: 'image/png',
+    bytes: stats.size,
+  });
+}
+
+/**
+ * Execute upscale action using Replicate Real-ESRGAN model via AI SDK
+ * Default model: nightmareai/real-esrgan
+ */
+async function executeUpscale(
+  options: UpscaleOptions,
+  context: ActionContext,
+  apiToken: string
+): Promise<MediaResult> {
+  const { input, scale = 2, model } = options;
+
+  if (!input?.source) {
+    return createError(ErrorCodes.INVALID_INPUT, 'Input source is required for upscaling');
+  }
+
+  const replicateClient = createReplicate({ apiToken });
+  const modelId = model || 'nightmareai/real-esrgan';
+
+  // Prepare the image input
+  let imageBuffer: Buffer;
+  if (input.isUrl) {
+    const response = await fetch(input.source);
+    if (!response.ok) {
+      return createError(ErrorCodes.NETWORK_ERROR, `Failed to fetch input image: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    imageBuffer = Buffer.from(arrayBuffer);
+  } else {
+    imageBuffer = await readFile(input.source);
+  }
+
+  const { image } = await generateImage({
+    model: replicateClient.image(modelId),
+    prompt: {
+      text: '',
+      images: [imageBuffer],
+    },
+    providerOptions: {
+      replicate: {
+        scale,
+      },
+    },
+  });
+
+  const outputFilename = resolveOutputFilename('png', 'upscaled', context.outputName, context.inputSource);
+  const outputPath = getOutputPath(context.outputDir, outputFilename);
+
+  await writeFile(outputPath, image.uint8Array);
+
+  const stats = await stat(outputPath);
+
+  return createSuccess({
+    mediaType: 'image',
+    action: 'upscale',
     provider: 'replicate',
     outputPath: outputPath,
     mime: 'image/png',

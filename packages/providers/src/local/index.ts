@@ -22,13 +22,14 @@ import {
 } from '@agent-media/core';
 import { executeBackgroundRemoval } from '../transformers/background-removal.js';
 import { executeTranscribe } from '../transformers/transcribe.js';
+import { executeUpscale } from '../transformers/upscale.js';
 
 /**
  * Actions supported by the local provider
  * - Sharp: resize, convert, extend, crop
  * - Transformers.js: remove-background, transcribe
  */
-const SUPPORTED_ACTIONS = ['resize', 'convert', 'extend', 'crop', 'remove-background', 'transcribe'];
+const SUPPORTED_ACTIONS = ['resize', 'convert', 'extend', 'crop', 'remove-background', 'transcribe', 'upscale'];
 
 /**
  * MIME types for image formats
@@ -110,6 +111,13 @@ export const localProvider: MediaProvider = {
         }
         case 'transcribe': {
           const result = await executeTranscribe(actionConfig.options, context);
+          if (result.ok) {
+            return { ...result, provider: 'local' };
+          }
+          return result;
+        }
+        case 'upscale': {
+          const result = await executeUpscale(actionConfig.options, context);
           if (result.ok) {
             return { ...result, provider: 'local' };
           }

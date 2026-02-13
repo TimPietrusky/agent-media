@@ -1,6 +1,6 @@
 ---
 name: agent-media
-description: Agent-first media toolkit for image, video, and audio processing. Use when you need to resize, convert, generate images, remove backgrounds, extract audio, transcribe speech, or generate videos. All commands return deterministic JSON output.
+description: Agent-first media toolkit for image, video, and audio processing. Use when you need to resize, convert, generate, edit, upscale images, remove backgrounds, extend or crop canvases, extract audio, transcribe speech, or generate videos. All commands return deterministic JSON output.
 ---
 
 # Agent Media
@@ -12,8 +12,12 @@ Agent Media is an agent-first media toolkit that provides CLI-accessible command
 ### Image Commands
 - `agent-media image resize` - Resize an image
 - `agent-media image convert` - Convert image format
-- `agent-media image remove-background` - Remove image background
 - `agent-media image generate` - Generate image from text
+- `agent-media image edit` - Edit image with text prompt
+- `agent-media image remove-background` - Remove image background
+- `agent-media image upscale` - Upscale image with AI super-resolution
+- `agent-media image extend` - Extend image canvas with padding
+- `agent-media image crop` - Crop image to dimensions around focal point
 
 ### Audio Commands
 - `agent-media audio extract` - Extract audio from video
@@ -52,10 +56,10 @@ On error:
 
 ## Providers
 
-- **local** - Default provider using Sharp (resize, convert) and Transformers.js (remove-background, transcribe)
-- **fal** - fal.ai provider (generate, edit, remove-background, transcribe, video)
-- **replicate** - Replicate API (generate, edit, remove-background, transcribe, video)
-- **runpod** - Runpod API (generate, edit)
+- **local** - Default provider using Sharp (resize, convert, extend, crop) and Transformers.js (remove-background, upscale, transcribe)
+- **fal** - fal.ai provider (generate, edit, remove-background, upscale, transcribe, video)
+- **replicate** - Replicate API (generate, edit, remove-background, upscale, transcribe, video)
+- **runpod** - Runpod API (generate, edit, video)
 - **ai-gateway** - Vercel AI Gateway (generate, edit)
 
 ## Provider Selection
