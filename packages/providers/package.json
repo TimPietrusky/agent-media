@@ -39,6 +39,10 @@
     "./ai-gateway": {
       "types": "./dist/ai-gateway/index.d.ts",
       "import": "./dist/ai-gateway/index.js"
+    },
+    "./atlas": {
+      "types": "./dist/atlas/index.d.ts",
+      "import": "./dist/atlas/index.js"
     }
   },
   "files": [

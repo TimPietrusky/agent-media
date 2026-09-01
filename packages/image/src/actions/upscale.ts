@@ -18,7 +18,7 @@ export interface UpscaleInput {
 
 /**
  * Upscale an image using AI super-resolution
- * Supports local (Swin2SR), fal (ESRGAN), and replicate (Real-ESRGAN) providers
+ * Supports local (Swin2SR), fal (ESRGAN), replicate (Real-ESRGAN), and Atlas providers
  */
 export async function upscale(options: UpscaleInput): Promise<MediaResult> {
   const isUrl = options.input.startsWith('http://') || options.input.startsWith('https://');

@@ -5,6 +5,7 @@ import { falProvider } from './fal/index.js';
 import { replicateProvider } from './replicate/index.js';
 import { runpodProvider } from './runpod/index.js';
 import { aiGatewayProvider } from './ai-gateway/index.js';
+import { atlasProvider } from './atlas/index.js';
 
 // Export individual providers
 export { localProvider } from './local/index.js';
@@ -13,6 +14,7 @@ export { falProvider } from './fal/index.js';
 export { replicateProvider } from './replicate/index.js';
 export { runpodProvider } from './runpod/index.js';
 export { aiGatewayProvider } from './ai-gateway/index.js';
+export { atlasProvider } from './atlas/index.js';
 
 /**
  * All available providers
@@ -24,6 +26,7 @@ export const providers = {
   replicate: replicateProvider,
   runpod: runpodProvider,
   'ai-gateway': aiGatewayProvider,
+  atlas: atlasProvider,
 };
 
 /**
@@ -38,6 +41,7 @@ export function registerAllProviders(): void {
   globalRegistry.register(replicateProvider);
   globalRegistry.register(runpodProvider);
   globalRegistry.register(aiGatewayProvider);
+  globalRegistry.register(atlasProvider);
 }
 
 /**

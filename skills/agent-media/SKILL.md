@@ -62,12 +62,16 @@ On error:
 - **replicate** - Replicate API (generate, edit, remove-background, upscale, transcribe, video)
 - **runpod** - Runpod API (generate, edit, video)
 - **ai-gateway** - Vercel AI Gateway (generate, edit)
+- **atlas** - Atlas Cloud (upscale; explicit opt-in)
 
 ## Provider Selection
 
 1. Explicit: `--provider <name>`
 2. Auto-detect from environment variables
 3. Fallback to local provider
+
+Atlas is never auto-selected from its API key. Use `--provider atlas` so local
+processing remains the default.
 
 ## Environment Variables
 
@@ -76,3 +80,4 @@ On error:
 - `REPLICATE_API_TOKEN` - Enable replicate provider
 - `RUNPOD_API_KEY` - Enable runpod provider
 - `AI_GATEWAY_API_KEY` - Enable ai-gateway provider
+- `ATLASCLOUD_API_KEY` - Enable the explicit Atlas provider
