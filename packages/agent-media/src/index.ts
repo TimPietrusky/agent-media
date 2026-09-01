@@ -295,7 +295,7 @@ imageCommand
   .requiredOption('--in <path>', 'Input file path or URL')
   .option('--scale <factor>', 'Scale factor (e.g., 2 or 4, default: 2)', parseInt)
   .option('--out <path>', 'Output path, filename or directory (default: ./)')
-  .option('--provider <name>', 'Provider to use (local, fal, replicate)')
+  .option('--provider <name>', 'Provider to use (local, fal, replicate, atlas)')
   .option('--model <name>', 'Model to use (overrides provider default)')
   .action(async (options: {
     in: string;

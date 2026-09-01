@@ -78,7 +78,7 @@ agent-media audio transcribe --in rob_cat_audio.mp3
 ## Requirements
 
 - Node.js >= 18.0.0
-- API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), [Runpod](https://www.runpod.io/console/user/settings), or [AI Gateway](https://vercel.com/ai-gateway) for AI features
+- API key from [fal.ai](https://fal.ai/dashboard/keys), [Replicate](https://replicate.com/account/api-tokens), [Runpod](https://www.runpod.io/console/user/settings), [AI Gateway](https://vercel.com/ai-gateway), or [Atlas Cloud](https://www.atlascloud.ai/) for AI features
 
 **Local processing** (no API key): resize, convert, extend, crop, upscale, audio extract, remove-background, transcribe
 
@@ -239,6 +239,7 @@ Upscale an image using AI super-resolution to increase resolution with detail ge
 agent-media image upscale --in sunset-mountains.jpg
 agent-media image upscale --in sunset-mountains.jpg --scale 4 --provider fal
 agent-media image upscale --in https://ytrzap04kkm0giml.public.blob.vercel-storage.com/sunset-mountains.jpg --provider replicate
+agent-media image upscale --in sunset-mountains.jpg --scale 4 --provider atlas
 ```
 
 | Option | Description |
@@ -246,7 +247,7 @@ agent-media image upscale --in https://ytrzap04kkm0giml.public.blob.vercel-stora
 | `--in <path>` | Input file path or URL (required) |
 | `--scale <n>` | Scale factor: 2 or 4 (default: 2). Local provider always outputs 4x. |
 | `--out <path>` | Output path, filename or directory (default: ./) |
-| `--provider <name>` | Provider (local, fal, replicate) |
+| `--provider <name>` | Provider (local, fal, replicate, atlas) |
 | `--model <name>` | Model override |
 
 ---
@@ -391,6 +392,7 @@ Exit code is `0` on success, `1` on error.
 | **replicate** | - | - | - | - | `black-forest-labs/flux-2-dev` | `black-forest-labs/flux-kontext-dev` | `men1scus/birefnet` | `nightmareai/real-esrgan` | `lightricks/ltx-video` | `whisper-diarization` |
 | **runpod** | - | - | - | - | `alibaba/wan-2.6` | `google/nano-banana-pro-edit` | - | - | `wan-2.6` | - |
 | **ai-gateway** | - | - | - | - | `bfl/flux-2-pro` | `google/gemini-3-pro-image` | - | - | - | - |
+| **atlas** | - | - | - | - | - | - | - | `atlascloud/image-upscaler` | - | - |
 
 \* Powered by [Sharp](https://sharp.pixelplumbing.com/) for fast image processing
 \** Powered by [Transformers.js](https://huggingface.co/docs/transformers.js) for local ML inference (models downloaded on first use)
@@ -404,6 +406,9 @@ Use `--model <name>` to override the default model for any command.
 3. **Fallback to local**: For resize/convert when no provider specified
 4. **First supporting provider**: For generate/remove-background
 
+Atlas is explicit-only: use `--provider atlas`. Setting `ATLASCLOUD_API_KEY`
+does not replace the default local provider.
+
 ## Environment Variables
 
 | Variable | Description | Get Key |
@@ -412,6 +417,7 @@ Use `--model <name>` to override the default model for any command.
 | `REPLICATE_API_TOKEN` | Replicate API token | [replicate.com](https://replicate.com/account/api-tokens) |
 | `RUNPOD_API_KEY` | Runpod API key | [runpod.io](https://www.runpod.io/console/user/settings) |
 | `AI_GATEWAY_API_KEY` | AI Gateway API key | [vercel.com](https://vercel.com/ai-gateway) |
+| `ATLASCLOUD_API_KEY` | Atlas Cloud API key | [atlascloud.ai](https://www.atlascloud.ai/) |
 | `AGENT_MEDIA_DIR` | Output directory (default: current directory) | - |
 
 ## Roadmap

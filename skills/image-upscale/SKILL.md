@@ -21,7 +21,7 @@ npx agent-media@latest image upscale --in <path> [options]
 | `--in` | Yes | Input file path or URL |
 | `--scale` | No | Scale factor (2 or 4, default: 2) |
 | `--out` | No | Output path, filename or directory (default: ./) |
-| `--provider` | No | Provider to use (local, fal, replicate) |
+| `--provider` | No | Provider to use (local, fal, replicate, atlas) |
 | `--model` | No | Model to use (overrides provider default) |
 
 ## Output
@@ -50,6 +50,11 @@ npx agent-media@latest image upscale --in photo.jpg
 Upscale 4x with specific provider:
 ```bash
 npx agent-media@latest image upscale --in photo.jpg --scale 4 --provider fal
+```
+
+Upscale through Atlas Cloud (explicit opt-in):
+```bash
+npx agent-media@latest image upscale --in photo.jpg --scale 4 --provider atlas
 ```
 
 Upscale with custom output:
@@ -83,3 +88,10 @@ npx agent-media@latest image upscale --in photo.jpg --provider local
 - Requires `REPLICATE_API_TOKEN`
 - Uses `nightmareai/real-esrgan` model
 - Supports 2-10x scale
+
+### atlas
+
+- Requires `ATLASCLOUD_API_KEY`
+- Uses `atlascloud/image-upscaler`
+- Supports 1-4x scale
+- Must be selected explicitly with `--provider atlas`; local remains the default
